@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "742072637199",
+    "firebase_url": "https://vampire-66a56.firebaseio.com",
+    "project_id": "vampire-66a56",
+    "storage_bucket": "vampire-66a56.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:742072637199:android:595726c9b82fc3bf2bd07a",
+        "android_client_info": {
+          "package_name": "com.example.vampir"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "742072637199-do1q4kll41v4vqcoitsda9624k6p5gcc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtXDEpslUHIq8lJuTjMPWaRT2_glTVCAE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "742072637199-do1q4kll41v4vqcoitsda9624k6p5gcc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
