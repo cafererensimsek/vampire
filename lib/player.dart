@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 class Player {
   final String name;
   final String role;
-  final bool isAlive;
+  bool isAlive;
   final bool isAdmin;
 
   Player({

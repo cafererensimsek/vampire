@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:vampir/player.dart';
+import 'create_player_list.dart';
+import 'player.dart';
 
 class NewGame extends StatefulWidget {
   final String adminEmail;
@@ -15,19 +16,15 @@ class _NewGameState extends State<NewGame> {
 
   _NewGameState(this.adminEmail);
 
-  @override
-  void initState() {
-    super.initState();
-    var admin = new Player(name: adminEmail, isAdmin: true, isAlive: true);
-  }
-
   var sessionID = Random().nextInt(1000000);
   var numberOfVampires = 1;
   var numberOfVillagers = 1;
 
   Widget startTheGame(context) {
     return FloatingActionButton.extended(
-      onPressed: () {
+      onPressed: () async {
+        var admin = new Player(name: adminEmail, isAdmin: true, isAlive: true);
+        await CreateList(admin: admin, sessionID: sessionID).createList();
         Navigator.push(context, MaterialPageRoute(builder: (context) => null));
       },
       label: Text('Start the game'),

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:vampir/new_game.dart';
+import 'new_game.dart';
+import 'night.dart';
 
 class Home extends StatefulWidget {
   final FirebaseUser user;
@@ -44,7 +45,7 @@ class _HomeState extends State<Home> {
       FlatButton(
         onPressed: () {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => null));
+              context, MaterialPageRoute(builder: (context) => Night()));
         },
         child: Text('Join a Game'),
       ),
