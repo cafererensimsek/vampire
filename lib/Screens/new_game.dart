@@ -1,7 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'create_player_list.dart';
-import 'player.dart';
+import '../Classes/create_player_list.dart';
+import 'night.dart';
+import '../Classes/player.dart';
 
 class NewGame extends StatefulWidget {
   final String adminEmail;
@@ -25,7 +26,8 @@ class _NewGameState extends State<NewGame> {
       onPressed: () async {
         var admin = new Player(name: adminEmail, isAdmin: true, isAlive: true);
         await CreateList(admin: admin, sessionID: sessionID).createList();
-        Navigator.push(context, MaterialPageRoute(builder: (context) => null));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Night()));
       },
       label: Text('Start the game'),
       icon: Icon(Icons.add),

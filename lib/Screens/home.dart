@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:vampir/Classes/add_player.dart';
 import 'new_game.dart';
 import 'night.dart';
+import '../Classes/player.dart';
 
 class Home extends StatefulWidget {
   final FirebaseUser user;
@@ -18,7 +20,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    sessionIDController.addListener(_changeSessionID());
+    sessionIDController.addListener(_changeSessionID);
   }
 
   @override
@@ -29,6 +31,7 @@ class _HomeState extends State<Home> {
 
   _changeSessionID() {
     sessionID = sessionIDController.text;
+    print(sessionID);
   }
 
   Widget joinGame(context) {
@@ -41,9 +44,15 @@ class _HomeState extends State<Home> {
           icon: Icon(Icons.confirmation_number),
         ),
       ),
-      SizedBox(height: 75),
+      SizedBox(height: 25),
       FlatButton(
-        onPressed: () {
+        onPressed: () async {
+          String userName =
+              widget.user.email.substring(0, widget.user.email.indexOf('@'));
+          Player player =
+              new Player(name: userName, isAlive: true, isAdmin: false);
+          await AddPlayer(player: player, sessionID: sessionID)
+              .addPlayer(player);
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => Night()));
         },
