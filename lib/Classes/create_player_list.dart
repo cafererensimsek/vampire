@@ -9,11 +9,11 @@ class CreateList {
   CreateList({this.admin, this.sessionID});
 
   Future createList() async {
-    String userName = admin.name.substring(0, admin.name.indexOf('@'));
+    String userName = admin.email.substring(0, admin.email.indexOf('@'));
     final CollectionReference playerList =
         Firestore.instance.collection(sessionID.toString());
     return admin.isAdmin
-        ? await playerList.document(admin.name).setData({
+        ? await playerList.document(admin.email).setData({
             'name': userName,
             'isAdmin': admin.isAdmin,
             'isAlive': admin.isAlive,

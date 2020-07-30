@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:vampir/Screens/lobby.dart';
 import '../Classes/create_player_list.dart';
-import 'night.dart';
 import '../Classes/player.dart';
 
 class NewGame extends StatefulWidget {
@@ -24,10 +24,20 @@ class _NewGameState extends State<NewGame> {
   Widget startTheGame(context) {
     return FloatingActionButton.extended(
       onPressed: () async {
-        var admin = new Player(name: adminEmail, isAdmin: true, isAlive: true);
+        var admin = new Player(
+          email: adminEmail,
+          isAdmin: true,
+          isAlive: true,
+          isWaiting: true,
+        );
         await CreateList(admin: admin, sessionID: sessionID).createList();
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Night()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => Lobby(
+                      player: admin,
+                      sessionID: sessionID.toString(),
+                    )));
       },
       label: Text('Start the game'),
       icon: Icon(Icons.add),

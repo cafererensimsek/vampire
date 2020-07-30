@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:vampir/Classes/add_player.dart';
+import 'lobby.dart';
 import 'new_game.dart';
-import 'night.dart';
 import '../Classes/player.dart';
 
 class Home extends StatefulWidget {
@@ -49,12 +49,17 @@ class _HomeState extends State<Home> {
         onPressed: () async {
           String userName =
               widget.user.email.substring(0, widget.user.email.indexOf('@'));
-          Player player =
-              new Player(name: userName, isAlive: true, isAdmin: false);
+          Player player = new Player(
+              email: userName, isAlive: true, isAdmin: false, isWaiting: true);
           await AddPlayer(player: player, sessionID: sessionID)
               .addPlayer(player);
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => Night()));
+              context,
+              MaterialPageRoute(
+                  builder: (context) => Lobby(
+                        player: player,
+                        sessionID: sessionID,
+                      )));
         },
         child: Text('Join a Game'),
       ),
@@ -92,8 +97,9 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: FittedBox(
-            child: Text('Welcome to Vampire ${widget.user.email}'),
-            fit: BoxFit.fitWidth),
+          child: Text('Welcome ${widget.user.email}'),
+          fit: BoxFit.fitWidth,
+        ),
         centerTitle: true,
       ),
       body: Scaffold(

@@ -75,7 +75,7 @@ class _BodyState extends State<Body> {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => Home(user: user)));
     } catch (e) {
-      return;
+      Scaffold.of(context).showSnackBar(snackbar(e.message));
     }
   }
 

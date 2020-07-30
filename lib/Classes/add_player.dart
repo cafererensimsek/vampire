@@ -7,10 +7,10 @@ class AddPlayer {
   AddPlayer({this.player, this.sessionID});
 
   Future addPlayer(Player player) async {
-    String userName = player.name.substring(0, player.name.indexOf('@'));
+    String userName = player.email.substring(0, player.email.indexOf('@'));
     final CollectionReference playerList =
         Firestore.instance.collection(sessionID);
-    return await playerList.document(player.name).setData({
+    return await playerList.document(player.email).setData({
       'name': userName,
       'isAdmin': false,
       'isAlive': player.isAlive,

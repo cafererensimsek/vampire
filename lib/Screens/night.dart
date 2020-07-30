@@ -9,10 +9,18 @@ class Night extends StatefulWidget {
 class _NightState extends State<Night> {
   int numberOfVillagers = 1;
 
-  Player testVampire =
-      new Player(isAlive: true, isAdmin: false, name: 'Eren', role: 'vampire');
+  Player testVampire = new Player(
+      isAlive: true,
+      isAdmin: false,
+      email: 'Eren',
+      role: 'vampire',
+      isWaiting: false);
   Player testVillager = new Player(
-      isAlive: true, isAdmin: false, name: 'Cafer', role: 'villager');
+      isAlive: true,
+      isAdmin: false,
+      email: 'Cafer',
+      role: 'villager',
+      isWaiting: false);
 
   Widget vampireNightScreen() {
     List<Player> aliveVillagers = [testVillager];
