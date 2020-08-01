@@ -47,19 +47,22 @@ class _HomeState extends State<Home> {
       SizedBox(height: 25),
       FlatButton(
         onPressed: () async {
-          String userName =
-              widget.user.email.substring(0, widget.user.email.indexOf('@'));
           Player player = new Player(
-              email: userName, isAlive: true, isAdmin: false, isWaiting: true);
+              email: widget.user.email,
+              isAlive: true,
+              isAdmin: false,
+              isWaiting: true);
           await AddPlayer(player: player, sessionID: sessionID)
               .addPlayer(player);
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => Lobby(
-                        player: player,
-                        sessionID: sessionID,
-                      )));
+            context,
+            MaterialPageRoute(
+              builder: (context) => Lobby(
+                player: player,
+                sessionID: sessionID,
+              ),
+            ),
+          );
         },
         child: Text('Join a Game'),
       ),

@@ -32,16 +32,19 @@ class _LobbyState extends State<Lobby> {
     );
   }
 
-  Widget adminLobby() {
-    final CollectionReference playerList =
-        Firestore.instance.collection(sessionID.toString());
-    var players = playerList.getDocuments();
+  getCurrentPlayers() async {
+    QuerySnapshot currentPlayers =
+        await Firestore.instance.collection(sessionID).getDocuments();
+    String docId = currentPlayers.documents[0].documentID;
+    return docId;
+  }
 
-    print(players);
-
+/*   Widget adminLobby() {
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: null,
+        onPressed: () {
+          print(players);
+        },
         label: Text('Start the game'),
         shape: RoundedRectangleBorder(),
         icon: Icon(Icons.add),
@@ -56,16 +59,20 @@ class _LobbyState extends State<Lobby> {
         ],
       ),
     );
-  }
+  } */
 
   @override
   Widget build(BuildContext context) {
-    if (player.isAdmin && player.isWaiting) {
+    String id = getCurrentPlayers();
+    return Container(
+      child: Text(id),
+    );
+    /* if (player.isAdmin && player.isWaiting) {
       return adminLobby();
     } else if (!player.isAdmin && player.isWaiting) {
       return loading();
     } else {
       return Text('To be added');
-    }
+    } */
   }
 }
