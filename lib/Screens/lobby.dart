@@ -47,15 +47,10 @@ class _LobbyState extends State<Lobby> {
         title: Text("Session ID:$sessionID"),
         centerTitle: true,
       ),
-      body: Column(
+      body: ListView(
         children: [
-          SizedBox(height: 50),
-          ListView(
-            children: [
-              for (String player in players)
-                Card(child: ListTile(title: Text(player))),
-            ],
-          ),
+          for (String player in players)
+            Card(child: ListTile(title: Text(player))),
         ],
       ),
     );
@@ -64,14 +59,15 @@ class _LobbyState extends State<Lobby> {
   @override
   Widget build(BuildContext context) {
     return StreamProvider<QuerySnapshot>.value(
-        value: currentPlayers,
-        child: StreamBuilder(
-          stream: currentPlayers,
-          builder: (context, snapshot) {
-            return snapshot.hasData
-                ? playerListDisplay(context)
-                : loading(context);
-          },
-        ));
+      value: currentPlayers,
+      child: StreamBuilder(
+        stream: currentPlayers,
+        builder: (context, snapshot) {
+          return snapshot.hasData
+              ? playerListDisplay(context)
+              : loading(context);
+        },
+      ),
+    );
   }
 }
