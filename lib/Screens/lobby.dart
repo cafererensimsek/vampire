@@ -18,8 +18,6 @@ class _LobbyState extends State<Lobby> {
   final String sessionID;
   _LobbyState({this.player, this.sessionID});
 
-  List<DocumentSnapshot> joinedPlayers;
-
   Widget loading() {
     return Scaffold(
       backgroundColor: Theme.of(context).accentColor,
@@ -32,41 +30,43 @@ class _LobbyState extends State<Lobby> {
     );
   }
 
-  getCurrentPlayers() async {
+  void getCurrentPlayers(playerList) async {
     QuerySnapshot currentPlayers =
         await Firestore.instance.collection(sessionID).getDocuments();
-    String docId = currentPlayers.documents[0].documentID;
-    return docId;
+
+    currentPlayers.documents.forEach((element) {
+      playerList.add(element.documentID);
+    });
   }
 
-/*   Widget adminLobby() {
+  Widget adminLobby() {
+    List<String> playerList = [];
+    getCurrentPlayers(playerList);
+
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          print(players);
-        },
-        label: Text('Start the game'),
-        shape: RoundedRectangleBorder(),
-        icon: Icon(Icons.add),
-      ),
-      appBar: AppBar(
-        title: Text('Session ID: $sessionID'),
-        centerTitle: true,
-      ),
-      body: ListView(
-        children: <Widget>[
-          Text(joinedPlayers.toString()),
-        ],
-      ),
-    );
-  } */
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            print(playerList);
+          },
+          label: Text('Start the game'),
+          shape: RoundedRectangleBorder(),
+          icon: Icon(Icons.add),
+        ),
+        appBar: AppBar(
+          title: Text('Session ID: $sessionID'),
+          centerTitle: true,
+        ),
+        body: Column(
+          children: [
+            Text('this is rendered'),
+            for (String player in playerList) ListTile(title: Text(player))
+          ],
+        ));
+  }
 
   @override
   Widget build(BuildContext context) {
-    String id = getCurrentPlayers();
-    return Container(
-      child: Text(id),
-    );
+    return adminLobby();
     /* if (player.isAdmin && player.isWaiting) {
       return adminLobby();
     } else if (!player.isAdmin && player.isWaiting) {
