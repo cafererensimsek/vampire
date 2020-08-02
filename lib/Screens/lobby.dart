@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:vampir/Screens/loading.dart';
 import 'package:vampir/Classes/player.dart';
+import 'package:provider/provider.dart';
+import 'package:vampir/Screens/night.dart';
 
 class Lobby extends StatefulWidget {
   final Player player;
@@ -18,61 +20,58 @@ class _LobbyState extends State<Lobby> {
   final String sessionID;
   _LobbyState({this.player, this.sessionID});
 
-  Widget loading() {
+  Stream<QuerySnapshot> get currentPlayers {
+    return Firestore.instance.collection(sessionID).snapshots();
+  }
+
+  Widget playerListDisplay(context) {
+    final currentPlayers = Provider.of<QuerySnapshot>(context);
+    List<String> players = [];
+
+    currentPlayers.documents.forEach((element) {
+      players.add(element.documentID);
+    });
+
     return Scaffold(
-      backgroundColor: Theme.of(context).accentColor,
-      body: Center(
-        child: SpinKitFadingCube(
-          color: Theme.of(context).primaryColor,
-          size: 100.0,
-        ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: player.isAdmin
+            ? () {
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => Night()));
+              }
+            : null,
+        label: Text('Start'),
+        shape: RoundedRectangleBorder(),
+      ),
+      appBar: AppBar(
+        title: Text("Session ID:$sessionID"),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          SizedBox(height: 50),
+          ListView(
+            children: [
+              for (String player in players)
+                Card(child: ListTile(title: Text(player))),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  void getCurrentPlayers(playerList) async {
-    QuerySnapshot currentPlayers =
-        await Firestore.instance.collection(sessionID).getDocuments();
-
-    currentPlayers.documents.forEach((element) {
-      playerList.add(element.documentID);
-    });
-  }
-
-  Widget adminLobby() {
-    List<String> playerList = [];
-    getCurrentPlayers(playerList);
-
-    return Scaffold(
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            print(playerList);
-          },
-          label: Text('Start the game'),
-          shape: RoundedRectangleBorder(),
-          icon: Icon(Icons.add),
-        ),
-        appBar: AppBar(
-          title: Text('Session ID: $sessionID'),
-          centerTitle: true,
-        ),
-        body: Column(
-          children: [
-            Text('this is rendered'),
-            for (String player in playerList) ListTile(title: Text(player))
-          ],
-        ));
-  }
-
   @override
   Widget build(BuildContext context) {
-    return adminLobby();
-    /* if (player.isAdmin && player.isWaiting) {
-      return adminLobby();
-    } else if (!player.isAdmin && player.isWaiting) {
-      return loading();
-    } else {
-      return Text('To be added');
-    } */
+    return StreamProvider<QuerySnapshot>.value(
+        value: currentPlayers,
+        child: StreamBuilder(
+          stream: currentPlayers,
+          builder: (context, snapshot) {
+            return snapshot.hasData
+                ? playerListDisplay(context)
+                : loading(context);
+          },
+        ));
   }
 }

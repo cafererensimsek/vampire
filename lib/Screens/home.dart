@@ -31,7 +31,6 @@ class _HomeState extends State<Home> {
 
   _changeSessionID() {
     sessionID = sessionIDController.text;
-    print(sessionID);
   }
 
   Widget joinGame(context) {
@@ -74,7 +73,6 @@ class _HomeState extends State<Home> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         SizedBox(height: 50),
-        Center(child: Text('User: ${widget.user.email}')),
         SizedBox(height: 50),
         joinGame(context),
       ],
