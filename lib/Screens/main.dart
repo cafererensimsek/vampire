@@ -32,6 +32,7 @@ class _BodyState extends State<Body> {
   String email;
   String password;
 
+  // snackbar template to display errors
   snackbar(txt) {
     return SnackBar(
       content: Row(
@@ -44,6 +45,7 @@ class _BodyState extends State<Body> {
     );
   }
 
+  // initState for controllers
   @override
   void initState() {
     super.initState();
@@ -51,6 +53,7 @@ class _BodyState extends State<Body> {
     passwordController.addListener(_changePassword);
   }
 
+  // dispose for controllers
   @override
   void dispose() {
     emailController.dispose();
@@ -58,6 +61,7 @@ class _BodyState extends State<Body> {
     super.dispose();
   }
 
+  // the functions to get email and password
   _changeEmail() {
     email = emailController.text;
   }
@@ -66,6 +70,7 @@ class _BodyState extends State<Body> {
     password = passwordController.text;
   }
 
+  // firebase signup function
   signUp() async {
     try {
       FirebaseUser user = (await FirebaseAuth.instance
@@ -79,6 +84,8 @@ class _BodyState extends State<Body> {
     }
   }
 
+  // tries to log in, if user not found signs it up and sends to home page,
+  //if neither shows the error
   Widget button() {
     return Builder(
       builder: (context) => FlatButton(

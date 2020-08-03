@@ -44,6 +44,9 @@ class _HomeState extends State<Home> {
         ),
       ),
       SizedBox(height: 25),
+
+      // creates a new non-admin user and sends him to the lobby of the
+      // given sessionID
       FlatButton(
         onPressed: () async {
           Player player = new Player(
@@ -68,31 +71,6 @@ class _HomeState extends State<Home> {
     ]);
   }
 
-  Widget homePageBody(context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        SizedBox(height: 50),
-        SizedBox(height: 50),
-        joinGame(context),
-      ],
-    );
-  }
-
-  Widget startNewGame(context) {
-    return FloatingActionButton.extended(
-      onPressed: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => NewGame(adminEmail: widget.user.email)));
-      },
-      label: Text('Create new game'),
-      icon: Icon(Icons.add),
-      shape: RoundedRectangleBorder(),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,8 +82,26 @@ class _HomeState extends State<Home> {
         centerTitle: true,
       ),
       body: Scaffold(
-        floatingActionButton: startNewGame(context),
-        body: homePageBody(context),
+        floatingActionButton: FloatingActionButton.extended(
+          // sends the user to the settings page with their email
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        NewGame(adminEmail: widget.user.email)));
+          },
+          label: Text('Create new game'),
+          icon: Icon(Icons.add),
+          shape: RoundedRectangleBorder(),
+        ),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(height: 50),
+            joinGame(context),
+          ],
+        ),
       ),
     );
   }

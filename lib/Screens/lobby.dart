@@ -20,10 +20,13 @@ class _LobbyState extends State<Lobby> {
   final String sessionID;
   _LobbyState({this.player, this.sessionID});
 
+  // subscribe to the data stream of the collection with the sessionID
   Stream<QuerySnapshot> get currentPlayers {
     return Firestore.instance.collection(sessionID).snapshots();
   }
 
+  // use a snapshot from the subscribed data to create a list of current
+  // players using the documentIDs
   Widget playerListDisplay(context) {
     final currentPlayers = Provider.of<QuerySnapshot>(context);
     List<String> players = [];
@@ -34,6 +37,8 @@ class _LobbyState extends State<Lobby> {
 
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
+        // start the game push the admin to first night
+        // add handle for non admins
         onPressed: player.isAdmin
             ? () {
                 Navigator.push(
@@ -47,6 +52,8 @@ class _LobbyState extends State<Lobby> {
         title: Text("Session ID:$sessionID"),
         centerTitle: true,
       ),
+      // create a listview of the current players
+      // automatically updated every time the state changes
       body: ListView(
         children: [
           for (String player in players)

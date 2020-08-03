@@ -6,6 +6,7 @@ class AddPlayer {
   final String sessionID;
   AddPlayer({this.player, this.sessionID});
 
+  // create and add a non-admin user to the given sessionID
   Future addPlayer(Player player) async {
     String userName = player.email.substring(0, player.email.indexOf('@'));
     final CollectionReference playerList =
