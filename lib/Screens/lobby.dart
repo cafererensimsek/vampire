@@ -37,8 +37,7 @@ class _LobbyState extends State<Lobby> {
 
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-        // start the game push the admin to first night
-        // add handle for non admins
+        // start the game, push the admin to first night
         onPressed: player.isAdmin
             ? () {
                 Navigator.push(
@@ -56,8 +55,21 @@ class _LobbyState extends State<Lobby> {
       // automatically updated every time the state changes
       body: ListView(
         children: [
-          for (String player in players)
-            Card(child: ListTile(title: Text(player))),
+          for (String playerID in players)
+            Card(
+              child: ListTile(
+                title: Text(playerID),
+                onTap: player.isAdmin
+                    ? () {
+                        Firestore.instance
+                            .collection(sessionID)
+                            .document(playerID)
+                            .delete();
+                      }
+                    : null,
+                leading: Icon(Icons.person),
+              ),
+            ),
         ],
       ),
     );

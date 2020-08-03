@@ -9,7 +9,7 @@ class CreateList {
   CreateList({this.admin, this.sessionID});
 
   // create a username with the characters up to '@'
-  // create the firestorecollection for the game
+  // create the firestore collection for the game
   // create the first document in the collection as the admin user
   Future createCollection() async {
     String userName = admin.email.substring(0, admin.email.indexOf('@'));
