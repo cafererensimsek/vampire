@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:vampir/Screens/loading.dart';
@@ -8,17 +10,24 @@ import 'package:vampir/Screens/night.dart';
 class Lobby extends StatefulWidget {
   final Player player;
   final String sessionID;
+  final int vampireCount;
 
-  const Lobby({Key key, this.player, this.sessionID}) : super(key: key);
+  const Lobby(
+      {Key key,
+      @required this.player,
+      @required this.sessionID,
+      this.vampireCount})
+      : super(key: key);
   @override
-  _LobbyState createState() =>
-      _LobbyState(player: player, sessionID: sessionID);
+  _LobbyState createState() => _LobbyState(
+      player: player, sessionID: sessionID, vampireCount: vampireCount);
 }
 
 class _LobbyState extends State<Lobby> {
   final Player player;
   final String sessionID;
-  _LobbyState({this.player, this.sessionID});
+  final int vampireCount;
+  _LobbyState({this.player, this.sessionID, this.vampireCount});
 
   // subscribe to the data stream of the collection with the sessionID
   Stream<QuerySnapshot> get currentPlayers {
@@ -50,6 +59,47 @@ class _LobbyState extends State<Lobby> {
       appBar: AppBar(
         title: Text("Session ID:$sessionID"),
         centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.shuffle),
+            onPressed: player.isAdmin
+                ? () {
+                    Firestore.instance
+                        .collection(sessionID)
+                        .getDocuments()
+                        .then((snapshot) {
+                      for (int i = 0; i < 2; i++) {
+                        Firestore.instance
+                            .collection(sessionID)
+                            .document(snapshot
+                                .documents[
+                                    Random().nextInt(snapshot.documents.length)]
+                                .documentID)
+                            .updateData({'role': 'vampire'});
+                      }
+                    });
+                  }
+                : null,
+          ),
+          IconButton(
+            icon: Icon(Icons.restore),
+            onPressed: player.isAdmin
+                ? () {
+                    Firestore.instance
+                        .collection(sessionID)
+                        .getDocuments()
+                        .then((snapshot) {
+                      for (int i = 0; i < snapshot.documents.length; i++) {
+                        Firestore.instance
+                            .collection(sessionID)
+                            .document(snapshot.documents[i].documentID)
+                            .updateData({'role': 'villager'});
+                      }
+                    });
+                  }
+                : null,
+          ),
+        ],
       ),
       // create a listview of the current players
       // automatically updated every time the state changes

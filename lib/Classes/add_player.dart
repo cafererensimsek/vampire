@@ -15,6 +15,8 @@ class AddPlayer {
       'name': userName,
       'isAdmin': false,
       'isAlive': player.isAlive,
+      'role': player.role,
+      'isWaiting': player.isWaiting,
     });
   }
 }

@@ -4,7 +4,7 @@ import 'player.dart';
 
 class CreateList {
   final Player admin;
-  final int sessionID;
+  final String sessionID;
 
   CreateList({this.admin, this.sessionID});
 
@@ -14,12 +14,14 @@ class CreateList {
   Future createCollection() async {
     String userName = admin.email.substring(0, admin.email.indexOf('@'));
     final CollectionReference playerList =
-        Firestore.instance.collection(sessionID.toString());
+        Firestore.instance.collection(sessionID);
     return admin.isAdmin
         ? await playerList.document(admin.email).setData({
             'name': userName,
             'isAdmin': admin.isAdmin,
             'isAlive': admin.isAlive,
+            'role': admin.role,
+            'isWaiting': admin.isWaiting,
           })
         : AlertDialog(
             content: Text('User is not an admin'),

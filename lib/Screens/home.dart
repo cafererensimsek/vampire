@@ -42,9 +42,9 @@ class _HomeState extends State<Home> {
           hintText: 'Session ID',
           icon: Icon(Icons.confirmation_number),
         ),
+        keyboardType: TextInputType.number,
       ),
       SizedBox(height: 25),
-
       // creates a new non-admin user and sends him to the lobby of the
       // given sessionID
       FlatButton(
@@ -53,7 +53,8 @@ class _HomeState extends State<Home> {
               email: widget.user.email,
               isAlive: true,
               isAdmin: false,
-              isWaiting: true);
+              isWaiting: true,
+              role: 'villager');
           await AddPlayer(player: player, sessionID: sessionID)
               .addPlayer(player);
           Navigator.push(

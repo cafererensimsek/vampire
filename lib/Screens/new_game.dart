@@ -17,9 +17,8 @@ class _NewGameState extends State<NewGame> {
 
   _NewGameState(this.adminEmail);
 
-  var sessionID = Random().nextInt(1000000);
+  var sessionID = Random().nextInt(1000000).toString();
   var numberOfVampires = 1;
-  var numberOfVillagers = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -33,11 +32,11 @@ class _NewGameState extends State<NewGame> {
           // creates an admin user and sends him to the lobby of his game
           onPressed: () async {
             var admin = new Player(
-              email: adminEmail,
-              isAdmin: true,
-              isAlive: true,
-              isWaiting: true,
-            );
+                email: adminEmail,
+                isAdmin: true,
+                isAlive: true,
+                isWaiting: true,
+                role: 'villager');
             // creates a collection in firestore with the name sessionID
             await CreateList(admin: admin, sessionID: sessionID)
                 .createCollection();
@@ -46,7 +45,8 @@ class _NewGameState extends State<NewGame> {
               MaterialPageRoute(
                 builder: (context) => Lobby(
                   player: admin,
-                  sessionID: sessionID.toString(),
+                  sessionID: sessionID,
+                  vampireCount: numberOfVampires,
                 ),
               ),
             );
@@ -83,45 +83,13 @@ class _NewGameState extends State<NewGame> {
                         value: value,
                       );
                     }).toList(),
-                    onChanged: (var newValue) {
+                    onChanged: (int newValue) {
                       setState(() {
                         numberOfVampires = newValue;
-                        print(numberOfVampires);
                       });
                     }),
               ),
-            ]),
-            Row(children: [
-              Container(
-                child: Text('Number of villagers: '),
-                padding: EdgeInsets.all(50),
-              ),
-              Container(
-                padding: EdgeInsets.all(50),
-                child: DropdownButton(
-                    icon: Icon(Icons.arrow_downward),
-                    iconSize: 24,
-                    elevation: 16,
-                    style: TextStyle(color: Theme.of(context).accentColor),
-                    underline: Container(
-                      height: 2,
-                      color: Theme.of(context).accentColor,
-                    ),
-                    value: numberOfVillagers,
-                    items: [1, 2, 3, 4, 5].map((var value) {
-                      return DropdownMenuItem(
-                        child: Text(value.toString()),
-                        value: value,
-                      );
-                    }).toList(),
-                    onChanged: (var newValue) {
-                      setState(() {
-                        numberOfVillagers = newValue;
-                        print(numberOfVillagers);
-                      });
-                    }),
-              ),
-            ]),
+            ])
           ],
         ),
       ),
