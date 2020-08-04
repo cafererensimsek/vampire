@@ -16,12 +16,11 @@ class CreateList {
     final CollectionReference playerList =
         Firestore.instance.collection(sessionID);
     return admin.isAdmin
-        ? await playerList.document(admin.email).setData({
+        ? await playerList.document(userName).setData({
             'name': userName,
             'isAdmin': admin.isAdmin,
             'isAlive': admin.isAlive,
             'role': admin.role,
-            'isWaiting': admin.isWaiting,
           })
         : AlertDialog(
             content: Text('User is not an admin'),

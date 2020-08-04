@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:vampir/Screens/loading.dart';
@@ -10,24 +9,22 @@ import 'package:vampir/Screens/night.dart';
 class Lobby extends StatefulWidget {
   final Player player;
   final String sessionID;
-  final int vampireCount;
 
-  const Lobby(
-      {Key key,
-      @required this.player,
-      @required this.sessionID,
-      this.vampireCount})
-      : super(key: key);
+  const Lobby({
+    Key key,
+    @required this.player,
+    @required this.sessionID,
+  }) : super(key: key);
   @override
-  _LobbyState createState() => _LobbyState(
-      player: player, sessionID: sessionID, vampireCount: vampireCount);
+  _LobbyState createState() =>
+      _LobbyState(player: player, sessionID: sessionID);
 }
 
 class _LobbyState extends State<Lobby> {
   final Player player;
   final String sessionID;
-  final int vampireCount;
-  _LobbyState({this.player, this.sessionID, this.vampireCount});
+
+  _LobbyState({this.player, this.sessionID});
 
   // subscribe to the data stream of the collection with the sessionID
   Stream<QuerySnapshot> get currentPlayers {
@@ -41,7 +38,9 @@ class _LobbyState extends State<Lobby> {
     List<String> players = [];
 
     currentPlayers.documents.forEach((element) {
-      players.add(element.documentID);
+      if (element.documentID != 'Game Settings') {
+        players.add(element.documentID);
+      }
     });
 
     return Scaffold(
@@ -61,44 +60,47 @@ class _LobbyState extends State<Lobby> {
         centerTitle: true,
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.shuffle),
-            onPressed: player.isAdmin
-                ? () {
-                    Firestore.instance
-                        .collection(sessionID)
-                        .getDocuments()
-                        .then((snapshot) {
-                      for (int i = 0; i < 2; i++) {
-                        Firestore.instance
-                            .collection(sessionID)
-                            .document(snapshot
-                                .documents[
-                                    Random().nextInt(snapshot.documents.length)]
-                                .documentID)
-                            .updateData({'role': 'vampire'});
-                      }
-                    });
-                  }
-                : null,
-          ),
+              icon: Icon(Icons.shuffle),
+              onPressed: player.isAdmin
+                  ? () {
+                      Firestore.instance
+                          .collection(sessionID)
+                          .getDocuments()
+                          .then((snapshot) {
+                        for (int i = 0;
+                            i < snapshot.documents[0].data['vampireCount'];
+                            i++) {
+                          Firestore.instance
+                              .collection(sessionID)
+                              .document(snapshot
+                                  .documents[(1 +
+                                      Random().nextInt(
+                                          snapshot.documents.length - 1))]
+                                  .documentID)
+                              .updateData({'role': 'vampire'});
+                          print((1 +
+                              Random().nextInt(snapshot.documents.length - 1)));
+                        }
+                      });
+                    }
+                  : null),
           IconButton(
-            icon: Icon(Icons.restore),
-            onPressed: player.isAdmin
-                ? () {
-                    Firestore.instance
-                        .collection(sessionID)
-                        .getDocuments()
-                        .then((snapshot) {
-                      for (int i = 0; i < snapshot.documents.length; i++) {
-                        Firestore.instance
-                            .collection(sessionID)
-                            .document(snapshot.documents[i].documentID)
-                            .updateData({'role': 'villager'});
-                      }
-                    });
-                  }
-                : null,
-          ),
+              icon: Icon(Icons.restore),
+              onPressed: player.isAdmin
+                  ? () {
+                      Firestore.instance
+                          .collection(sessionID)
+                          .getDocuments()
+                          .then((snapshot) {
+                        for (int i = 1; i < snapshot.documents.length; i++) {
+                          Firestore.instance
+                              .collection(sessionID)
+                              .document(snapshot.documents[i].documentID)
+                              .updateData({'role': 'villager'});
+                        }
+                      });
+                    }
+                  : null),
         ],
       ),
       // create a listview of the current players
@@ -108,7 +110,10 @@ class _LobbyState extends State<Lobby> {
           for (String playerID in players)
             Card(
               child: ListTile(
-                title: Text(playerID),
+                title: Padding(
+                  padding: const EdgeInsets.only(left: 50),
+                  child: Text(playerID),
+                ),
                 onTap: player.isAdmin
                     ? () {
                         Firestore.instance
@@ -117,7 +122,10 @@ class _LobbyState extends State<Lobby> {
                             .delete();
                       }
                     : null,
-                leading: Icon(Icons.person),
+                leading: Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Icon(Icons.person),
+                ),
               ),
             ),
         ],

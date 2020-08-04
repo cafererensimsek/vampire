@@ -53,7 +53,6 @@ class _HomeState extends State<Home> {
               email: widget.user.email,
               isAlive: true,
               isAdmin: false,
-              isWaiting: true,
               role: 'villager');
           await AddPlayer(player: player, sessionID: sessionID)
               .addPlayer(player);

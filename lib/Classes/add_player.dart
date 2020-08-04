@@ -11,12 +11,11 @@ class AddPlayer {
     String userName = player.email.substring(0, player.email.indexOf('@'));
     final CollectionReference playerList =
         Firestore.instance.collection(sessionID);
-    return await playerList.document(player.email).setData({
+    return await playerList.document(userName).setData({
       'name': userName,
       'isAdmin': false,
       'isAlive': player.isAlive,
       'role': player.role,
-      'isWaiting': player.isWaiting,
     });
   }
 }

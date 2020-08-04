@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:vampir/Screens/lobby.dart';
 import '../Classes/create_player_list.dart';
@@ -18,7 +19,7 @@ class _NewGameState extends State<NewGame> {
   _NewGameState(this.adminEmail);
 
   var sessionID = Random().nextInt(1000000).toString();
-  var numberOfVampires = 1;
+  var numberOfVampires;
 
   @override
   Widget build(BuildContext context) {
@@ -35,18 +36,23 @@ class _NewGameState extends State<NewGame> {
                 email: adminEmail,
                 isAdmin: true,
                 isAlive: true,
-                isWaiting: true,
                 role: 'villager');
             // creates a collection in firestore with the name sessionID
             await CreateList(admin: admin, sessionID: sessionID)
                 .createCollection();
+            Firestore.instance
+                .collection(sessionID)
+                .document('Game Settings')
+                .setData({
+              'vampireCount': numberOfVampires,
+              'isInLobby': true,
+            });
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => Lobby(
                   player: admin,
                   sessionID: sessionID,
-                  vampireCount: numberOfVampires,
                 ),
               ),
             );
@@ -57,40 +63,29 @@ class _NewGameState extends State<NewGame> {
         ),
 
         // select two values for the game settings
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Row(children: [
-              Container(
-                child: Text('Number of vampires: '),
-                padding: EdgeInsets.all(50),
-              ),
-              Container(
-                padding: EdgeInsets.all(50),
-                child: DropdownButton(
-                    icon: Icon(Icons.arrow_downward),
-                    iconSize: 24,
-                    elevation: 16,
-                    style: TextStyle(color: Theme.of(context).accentColor),
-                    underline: Container(
-                      height: 2,
-                      color: Theme.of(context).accentColor,
-                    ),
-                    value: numberOfVampires,
-                    items: [1, 2, 3, 4, 5].map((var value) {
-                      return DropdownMenuItem(
-                        child: Text(value.toString()),
-                        value: value,
-                      );
-                    }).toList(),
-                    onChanged: (int newValue) {
-                      setState(() {
-                        numberOfVampires = newValue;
-                      });
-                    }),
-              ),
-            ])
-          ],
+        body: Center(
+          child: DropdownButton<int>(
+            value: numberOfVampires,
+            icon: Icon(Icons.arrow_downward),
+            iconSize: 24,
+            elevation: 16,
+            style: TextStyle(color: Colors.deepPurple),
+            underline: Container(
+              height: 2,
+              color: Theme.of(context).accentColor,
+            ),
+            onChanged: (int newValue) {
+              setState(() {
+                numberOfVampires = newValue;
+              });
+            },
+            items: <int>[1, 2, 3, 4, 5].map<DropdownMenuItem<int>>((int value) {
+              return DropdownMenuItem<int>(
+                value: value,
+                child: Text(value.toString()),
+              );
+            }).toList(),
+          ),
         ),
       ),
     );

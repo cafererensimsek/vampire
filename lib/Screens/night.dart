@@ -10,17 +10,17 @@ class _NightState extends State<Night> {
   int numberOfVillagers = 1;
 
   Player testVampire = new Player(
-      isAlive: true,
-      isAdmin: false,
-      email: 'Eren',
-      role: 'vampire',
-      isWaiting: false);
+    isAlive: true,
+    isAdmin: false,
+    email: 'Eren',
+    role: 'vampire',
+  );
   Player testVillager = new Player(
-      isAlive: true,
-      isAdmin: false,
-      email: 'Cafer',
-      role: 'villager',
-      isWaiting: false);
+    isAlive: true,
+    isAdmin: false,
+    email: 'Cafer',
+    role: 'villager',
+  );
 
   Widget vampireNightScreen() {
     List<Player> aliveVillagers = [testVillager];
