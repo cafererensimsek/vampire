@@ -56,18 +56,20 @@ class _LobbyState extends State<Lobby> {
                     .updateData({
                   'isInLobby': false,
                 });
-                Navigator.push(context, MaterialPageRoute(builder: (context) => Night()));
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => Night()));
               }
             : () {
                 Firestore.instance
                     .collection(sessionID)
                     .document('Game Settings')
                     .get()
-                    .then((value) => {if (value.data.containsValue(true)) {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => Night()));
-                    } else {
-                      null;
-                    }});
+                    .then((value) {
+                  if (value.data.containsValue(false)) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Night()));
+                  }
+                });
               },
         label: Text('Start'),
         shape: RoundedRectangleBorder(),
