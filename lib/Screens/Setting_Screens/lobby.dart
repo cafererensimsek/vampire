@@ -1,10 +1,12 @@
+// Arrange the players, assing the roles and start the game
+
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:vampir/Screens/Game_Screens/night.dart';
 import 'package:vampir/Screens/loading.dart';
 import 'package:vampir/Classes/player.dart';
 import 'package:provider/provider.dart';
-import 'package:vampir/Screens/Game%20Screens/night.dart';
 
 class Lobby extends StatefulWidget {
   final Player player;
@@ -48,10 +50,25 @@ class _LobbyState extends State<Lobby> {
         // start the game, push the admin to first night
         onPressed: player.isAdmin
             ? () {
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => Night()));
+                Firestore.instance
+                    .collection(sessionID)
+                    .document('Game Settings')
+                    .updateData({
+                  'isInLobby': false,
+                });
+                Navigator.push(context, MaterialPageRoute(builder: (context) => Night()));
               }
-            : null,
+            : () {
+                Firestore.instance
+                    .collection(sessionID)
+                    .document('Game Settings')
+                    .get()
+                    .then((value) => {if (value.data.containsValue(true)) {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => Night()));
+                    } else {
+                      null;
+                    }});
+              },
         label: Text('Start'),
         shape: RoundedRectangleBorder(),
       ),

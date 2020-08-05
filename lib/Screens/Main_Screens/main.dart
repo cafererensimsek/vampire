@@ -1,6 +1,9 @@
+// Sign in/up and go to home page
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../Game Screens/home.dart';
+
+import 'home.dart';
 
 void main() {
   runApp(MyApp());

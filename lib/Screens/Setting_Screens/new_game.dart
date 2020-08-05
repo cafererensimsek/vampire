@@ -1,9 +1,10 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:vampir/Screens/lobby.dart';
-import '../../../Classes/create_player_list.dart';
-import '../../../Classes/player.dart';
+import 'package:vampir/Classes/create_player_list.dart';
+import 'package:vampir/Classes/player.dart';
+
+import 'lobby.dart';
 
 class NewGame extends StatefulWidget {
   final String adminEmail;
@@ -62,7 +63,7 @@ class _NewGameState extends State<NewGame> {
           shape: RoundedRectangleBorder(),
         ),
 
-        // select two values for the game settings
+        // select the vampire count
         body: Center(
           child: DropdownButton<int>(
             value: numberOfVampires,

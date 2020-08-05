@@ -8,7 +8,7 @@
             "name": "Flutter",
             "request": "launch",
             "type": "dart",
-            "program": "lib/Screens/main.dart",
+            "program": "lib/Screens/Main_Screens/main.dart",
         }
     ]
 }
