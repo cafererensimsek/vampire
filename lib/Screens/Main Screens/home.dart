@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:vampir/Classes/add_player.dart';
-import 'lobby.dart';
+import '../lobby.dart';
 import 'new_game.dart';
-import '../Classes/player.dart';
+import '../../Classes/player.dart';
 
 class Home extends StatefulWidget {
   final FirebaseUser user;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../Classes/player.dart';
+import '../../Classes/player.dart';
 
 class Night extends StatefulWidget {
   @override

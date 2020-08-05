@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:vampir/Screens/loading.dart';
 import 'package:vampir/Classes/player.dart';
 import 'package:provider/provider.dart';
-import 'package:vampir/Screens/night.dart';
+import 'package:vampir/Screens/Game%20Screens/night.dart';
 
 class Lobby extends StatefulWidget {
   final Player player;

@@ -2,8 +2,8 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:vampir/Screens/lobby.dart';
-import '../Classes/create_player_list.dart';
-import '../Classes/player.dart';
+import '../../../Classes/create_player_list.dart';
+import '../../../Classes/player.dart';
 
 class NewGame extends StatefulWidget {
   final String adminEmail;
