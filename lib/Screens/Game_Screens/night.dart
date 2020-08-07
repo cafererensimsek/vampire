@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:vampir/Classes/player.dart';
+import 'package:vampir/Screens/loading.dart';
 
 class Night extends StatefulWidget {
   final String sessionID;
@@ -16,23 +17,30 @@ class _NightState extends State<Night> {
   final Player player;
   _NightState(this.sessionID, this.player);
 
-  // subscribe to the data stream of the collection with the sessionID
-  Stream<QuerySnapshot> get currentPlayers {
-    return Firestore.instance.collection(sessionID).snapshots();
-  }
-
-  Widget night(context, CollectionReference database, bool didVote) {
-    List<String> playerIDs = [];
-
-    Firestore.instance.collection(sessionID).getDocuments().then(
-          (value) => value.documents.forEach((element) {
-            playerIDs.add(element.documentID);
-          }),
-        );
-
+  Widget night(context, CollectionReference database, bool didVote, playerIDs) {
     return Scaffold(
       appBar: AppBar(
         title: Center(child: Text('Your role: ${player.role}')),
+
+        // reset votes
+        /* actions: [
+          IconButton(
+              icon: Icon(Icons.restore),
+              onPressed: player.isAdmin
+                  ? () {
+                      database
+                          .document('Game Settings')
+                          .collection('Night Values')
+                          .document('Villgaer Votes')
+                          .delete();
+                      database.getDocuments().then((snapshot) => {
+                            snapshot.documents.forEach((document) {
+                              document.updateData
+                            })
+                          });
+                    }
+                  : null),
+        ], */
       ),
       // create a listview of the current players
       // automatically updated every time the state changes
@@ -75,6 +83,31 @@ class _NightState extends State<Night> {
   Widget build(BuildContext context) {
     CollectionReference database = Firestore.instance.collection(sessionID);
 
-    return night(context, database, false);
+    List<String> playerIDs = [];
+    Future<List<String>> getPlayers() async {
+      QuerySnapshot docs =
+          await Firestore.instance.collection(sessionID).getDocuments();
+      docs.documents.forEach((element) {
+        if (element.documentID != 'Game Settings') {
+          playerIDs.add(element.documentID);
+        }
+      });
+
+      return playerIDs;
+    }
+
+    return FutureBuilder(
+      future: getPlayers(),
+      builder: (context, snapshot) {
+        return snapshot.hasData
+            ? night(
+                context,
+                database,
+                false,
+                playerIDs,
+              )
+            : loading(context);
+      },
+    );
   }
 }
