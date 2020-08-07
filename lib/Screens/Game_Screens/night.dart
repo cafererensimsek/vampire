@@ -1,9 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:vampir/Classes/player.dart';
-
-import '../loading.dart';
 
 class Night extends StatefulWidget {
   final String sessionID;
@@ -25,14 +22,13 @@ class _NightState extends State<Night> {
   }
 
   Widget night(context, CollectionReference database, bool didVote) {
-    final currentPlayers = Provider.of<QuerySnapshot>(context);
     List<String> playerIDs = [];
 
-    currentPlayers.documents.forEach((element) {
-      if (element.documentID != 'Game Settings') {
-        playerIDs.add(element.documentID);
-      }
-    });
+    Firestore.instance.collection(sessionID).getDocuments().then(
+          (value) => value.documents.forEach((element) {
+            playerIDs.add(element.documentID);
+          }),
+        );
 
     return Scaffold(
       appBar: AppBar(
@@ -79,17 +75,6 @@ class _NightState extends State<Night> {
   Widget build(BuildContext context) {
     CollectionReference database = Firestore.instance.collection(sessionID);
 
-    bool didVote = false;
-
-    return StreamProvider.value(
-      value: currentPlayers,
-      child: StreamBuilder(
-          stream: currentPlayers,
-          builder: (context, snapshot) {
-            return snapshot.hasData
-                ? night(context, database, didVote)
-                : loading(context);
-          }),
-    );
+    return night(context, database, false);
   }
 }
