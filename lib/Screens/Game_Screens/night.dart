@@ -1,82 +1,95 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../Classes/player.dart';
+import 'package:provider/provider.dart';
+import 'package:vampir/Classes/player.dart';
+
+import '../loading.dart';
 
 class Night extends StatefulWidget {
+  final String sessionID;
+  final Player player;
+
+  const Night({Key key, this.sessionID, this.player}) : super(key: key);
   @override
-  _NightState createState() => _NightState();
+  _NightState createState() => _NightState(sessionID, player);
 }
 
 class _NightState extends State<Night> {
-  int numberOfVillagers = 1;
+  final String sessionID;
+  final Player player;
+  _NightState(this.sessionID, this.player);
 
-  Player testVampire = new Player(
-    isAlive: true,
-    isAdmin: false,
-    email: 'Eren',
-    role: 'vampire',
-  );
-  Player testVillager = new Player(
-    isAlive: true,
-    isAdmin: false,
-    email: 'Cafer',
-    role: 'villager',
-  );
-
-  Widget vampireNightScreen() {
-    List<Player> aliveVillagers = [testVillager];
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('Night'),
-          centerTitle: true,
-        ),
-        body: ListView.builder(
-          itemCount: aliveVillagers.length,
-          itemBuilder: (context, index) {
-            return ChoiceChip(
-              selected: !aliveVillagers[index].isAlive,
-              label: Text(index.toString()),
-              onSelected: (bool selected) {
-                setState(
-                  () {
-                    aliveVillagers[index].isAlive =
-                        !aliveVillagers[index].isAlive;
-                  },
-                );
-              },
-            );
-          },
-        ));
+  // subscribe to the data stream of the collection with the sessionID
+  Stream<QuerySnapshot> get currentPlayers {
+    return Firestore.instance.collection(sessionID).snapshots();
   }
 
-  Widget villagerNightScreen() {
-    List<Player> alivePlayers = [testVillager, testVampire];
+  Widget night(context, CollectionReference database, bool didVote) {
+    final currentPlayers = Provider.of<QuerySnapshot>(context);
+    List<String> playerIDs = [];
+
+    currentPlayers.documents.forEach((element) {
+      if (element.documentID != 'Game Settings') {
+        playerIDs.add(element.documentID);
+      }
+    });
+
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Night'),
-          centerTitle: true,
-        ),
-        body: ListView.builder(
-          itemCount: alivePlayers.length,
-          itemBuilder: (context, index) {
-            return ChoiceChip(
-              selected: !alivePlayers[index].isAlive,
-              label: Text(index.toString()),
-              onSelected: (bool selected) {
-                setState(
-                  () {
-                    alivePlayers[index].isAlive = !alivePlayers[index].isAlive;
-                  },
-                );
-              },
-            );
-          },
-        ));
+      appBar: AppBar(
+        title: Center(child: Text('Your role: ${player.role}')),
+      ),
+      // create a listview of the current players
+      // automatically updated every time the state changes
+      body: ListView(
+        children: [
+          for (String playerID in playerIDs)
+            Card(
+              child: ListTile(
+                title: Padding(
+                  padding: const EdgeInsets.only(left: 25),
+                  child: Text(playerID),
+                ),
+                onTap: () {
+                  if (player.role == 'villager' && !didVote) {
+                    database
+                        .document('Game Settings')
+                        .collection('Night Values')
+                        .document('Villager Votes')
+                        .setData({
+                      player.name: playerID,
+                    });
+                    didVote = true;
+                    database
+                        .document(player.name)
+                        .setData({'didVote': didVote}, merge: true);
+                  }
+                },
+                leading: Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Icon(Icons.person),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return (testVampire.role != 'vampire')
-        ? vampireNightScreen()
-        : villagerNightScreen();
+    CollectionReference database = Firestore.instance.collection(sessionID);
+
+    bool didVote = false;
+
+    return StreamProvider.value(
+      value: currentPlayers,
+      child: StreamBuilder(
+          stream: currentPlayers,
+          builder: (context, snapshot) {
+            return snapshot.hasData
+                ? night(context, database, didVote)
+                : loading(context);
+          }),
+    );
   }
 }

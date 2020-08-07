@@ -8,12 +8,11 @@ class AddPlayer {
 
   // create and add a non-admin user to the given sessionID
   Future addPlayer(Player player) async {
-    String userName = player.email.substring(0, player.email.indexOf('@'));
     final CollectionReference playerList =
         Firestore.instance.collection(sessionID);
-    return await playerList.document(userName).setData({
-      'name': userName,
-      'isAdmin': false,
+    return await playerList.document(player.name).setData({
+      'name': player.name,
+      'isAdmin': player.isAdmin,
       'isAlive': player.isAlive,
       'role': player.role,
     });

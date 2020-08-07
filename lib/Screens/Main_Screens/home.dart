@@ -52,9 +52,11 @@ class _HomeState extends State<Home> {
       FlatButton(
         onPressed: () async {
           Player player = new Player(
+              name: widget.user.email
+                  .substring(0, widget.user.email.indexOf('@')),
               email: widget.user.email,
               isAlive: true,
-              isAdmin: false,
+              isAdmin: true,
               role: 'villager');
           await AddPlayer(player: player, sessionID: sessionID)
               .addPlayer(player);

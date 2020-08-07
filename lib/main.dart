@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'home.dart';
+import 'Screens/Main_Screens/home.dart';
 
 void main() {
   runApp(MyApp());
@@ -130,6 +130,7 @@ class _BodyState extends State<Body> {
           decoration:
               InputDecoration(hintText: 'Email', icon: Icon(Icons.mail)),
         ),
+        SizedBox(height: 20),
         TextField(
           controller: passwordController,
           obscureText: true,

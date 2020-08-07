@@ -34,6 +34,7 @@ class _NewGameState extends State<NewGame> {
           // creates an admin user and sends him to the lobby of his game
           onPressed: () async {
             var admin = new Player(
+                name: adminEmail.substring(0, adminEmail.indexOf('@')),
                 email: adminEmail,
                 isAdmin: true,
                 isAlive: true,
