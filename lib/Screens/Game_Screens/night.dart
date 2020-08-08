@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:vampir/Classes/player.dart';
 import 'package:vampir/Screens/loading.dart';
+import 'day.dart';
+import 'package:vampir/Classes/end_night.dart';
 
 class Night extends StatefulWidget {
   final String sessionID;
@@ -24,33 +26,39 @@ class _NightState extends State<Night> {
         // start the game, push the admin to first night
         onPressed: player.isAdmin
             ? () {
-                database.document('Game Settings').updateData({
-                  'didNightEnd': true,
-                });
+                EndNight(sessionID);
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            Night(sessionID: sessionID, player: player)));
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Day(
+                      sessionID: sessionID,
+                      player: player,
+                    ),
+                  ),
+                );
               }
             : () {
                 database.document('Game Settings').get().then((value) {
                   if (value.data['didNightEnd'] == true) {
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                Night(sessionID: sessionID, player: player)));
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Day(
+                          sessionID: sessionID,
+                          player: player,
+                        ),
+                      ),
+                    );
                   }
                 });
               },
-        label: Text('Start'),
+        label: Text('End the Night'),
         shape: RoundedRectangleBorder(),
       ),
       appBar: AppBar(
         title: Padding(
           padding: const EdgeInsets.only(left: 15),
-          child: Text('Your role: ${player.role}'),
+          child: Text('It\'s Night. You are a ${player.role}'),
         ),
       ),
       // create a listview of the current players
@@ -84,6 +92,31 @@ class _NightState extends State<Night> {
                         .document('Game Settings')
                         .collection('Night Values')
                         .document('Villager Votes')
+                        .setData({
+                      votedFor: FieldValue.increment(-1),
+                      playerID: FieldValue.increment(1),
+                    }, merge: true);
+                    votedFor = playerID;
+                  } else if (player.role == 'vampire' &&
+                      !didVote &&
+                      playerID != player.name) {
+                    database
+                        .document('Game Settings')
+                        .collection('Night Values')
+                        .document('Vampire Votes')
+                        .setData({
+                      playerID: FieldValue.increment(1),
+                    }, merge: true);
+                    didVote = true;
+                    votedFor = playerID;
+                  } else if (player.role == 'vampire' &&
+                      didVote &&
+                      votedFor != playerID &&
+                      playerID != player.name) {
+                    database
+                        .document('Game Settings')
+                        .collection('Night Values')
+                        .document('Vampire Votes')
                         .setData({
                       votedFor: FieldValue.increment(-1),
                       playerID: FieldValue.increment(1),
