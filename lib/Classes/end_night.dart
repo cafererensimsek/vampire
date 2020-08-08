@@ -23,7 +23,7 @@ class EndNight {
         .document('Villager Votes')
         .get()
         .then((value) {
-      List votes = value.data.values.toList();
+      List<int> votes = value.data.values.toList();
       votes.sort();
       votes = votes.reversed.toList();
       return votes[0] > votes[1] ? findKey(value.data, votes[0]) : false;
