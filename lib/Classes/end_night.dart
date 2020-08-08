@@ -17,13 +17,13 @@ class EndNight {
 
   dynamic findVillagerChoice() {
     Firestore.instance
-        .collection('sessionID')
+        .collection(sessionID)
         .document('Game Settings')
         .collection('Night Values')
         .document('Villager Votes')
         .get()
         .then((value) {
-      List<int> votes = value.data.values;
+      List votes = value.data.values.toList();
       votes.sort();
       votes = votes.reversed.toList();
       return votes[0] > votes[1] ? findKey(value.data, votes[0]) : false;
@@ -32,7 +32,7 @@ class EndNight {
 
   dynamic findVampireChoice() {
     Firestore.instance
-        .collection('sessionID')
+        .collection(sessionID)
         .document('Game Settings')
         .collection('Night Values')
         .document('Vamprie Votes')

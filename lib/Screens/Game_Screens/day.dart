@@ -22,7 +22,7 @@ class _DayState extends State<Day> {
   @override
   Widget build(BuildContext context) {
     String villagerKill;
-    String vampireKill;
+    //String vampireKill;
 
     Firestore.instance
         .collection(sessionID)
@@ -32,13 +32,13 @@ class _DayState extends State<Day> {
         .get()
         .then((value) => villagerKill = value.data['Villager Kill']);
 
-    Firestore.instance
+/*     Firestore.instance
         .collection(sessionID)
         .document('Game Settings')
         .collection('Night Values')
         .document('Vampire Kill')
         .get()
-        .then((value) => vampireKill = value.data['Vampire Kill']);
+        .then((value) => vampireKill = value.data['Vampire Kill']); */
 
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
@@ -90,7 +90,7 @@ class _DayState extends State<Day> {
       body: Column(
         children: [
           Text('Villagers killed: $villagerKill'),
-          Text('Villagers killed: $vampireKill'),
+          //Text('Villagers killed: $vampireKill'),
         ],
       ),
     );

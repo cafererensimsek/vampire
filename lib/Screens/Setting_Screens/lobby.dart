@@ -61,7 +61,7 @@ class _LobbyState extends State<Lobby> {
               }
             : () {
                 database.document('Game Settings').get().then((value) {
-                  if (value.data['isInLobby'] == false) {
+                  if (value.data.containsValue(false)) {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
