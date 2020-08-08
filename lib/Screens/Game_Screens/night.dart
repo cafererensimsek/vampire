@@ -20,6 +20,33 @@ class _NightState extends State<Night> {
   Widget night(context, CollectionReference database, List<String> playerIDs,
       bool didVote, String votedFor) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        // start the game, push the admin to first night
+        onPressed: player.isAdmin
+            ? () {
+                database.document('Game Settings').updateData({
+                  'didNightEnd': true,
+                });
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            Night(sessionID: sessionID, player: player)));
+              }
+            : () {
+                database.document('Game Settings').get().then((value) {
+                  if (value.data['didNightEnd'] == true) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                Night(sessionID: sessionID, player: player)));
+                  }
+                });
+              },
+        label: Text('Start'),
+        shape: RoundedRectangleBorder(),
+      ),
       appBar: AppBar(
         title: Padding(
           padding: const EdgeInsets.only(left: 15),
