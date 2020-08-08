@@ -88,11 +88,8 @@ class _DayState extends State<Day> {
         ),
       ),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(height: 50),
           Text('Villagers killed: $villagerKill'),
-          SizedBox(height: 50),
           Text('Villagers killed: $vampireKill'),
         ],
       ),

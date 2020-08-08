@@ -5,6 +5,16 @@ class EndNight {
 
   EndNight(this.sessionID);
 
+  String findKey(Map<String, dynamic> map, int givenValue) {
+    String keyToFind;
+    map.forEach((key, value) {
+      if (value == givenValue) {
+        keyToFind = key;
+      }
+    });
+    return keyToFind;
+  }
+
   dynamic findVillagerChoice() {
     Firestore.instance
         .collection('sessionID')
@@ -16,15 +26,7 @@ class EndNight {
       List<int> votes = value.data.values;
       votes.sort();
       votes = votes.reversed.toList();
-      if (votes[0] == votes[1]) {
-        return false;
-      } else {
-        value.data.forEach((key, value) {
-          if (value == votes[0]) {
-            return key;
-          }
-        });
-      }
+      return votes[0] > votes[1] ? findKey(value.data, votes[0]) : false;
     });
   }
 
@@ -39,23 +41,15 @@ class EndNight {
       List<int> votes = value.data.values;
       votes.sort();
       votes = votes.reversed.toList();
-      if (votes[0] == votes[1]) {
-        return false;
-      } else {
-        value.data.forEach((key, value) {
-          if (value == votes[0]) {
-            return key;
-          }
-        });
-      }
+      return votes[0] > votes[1] ? findKey(value.data, votes[0]) : false;
     });
   }
 
-  void killVillagerChoice(sessionID) {
-    if (findVillagerChoice() != false) {
+  void killVillagerChoice(sessionID, villagerChoice) {
+    if (villagerChoice != false) {
       Firestore.instance
           .collection(sessionID)
-          .document(findVillagerChoice())
+          .document(villagerChoice)
           .delete();
     }
     Firestore.instance
@@ -69,17 +63,14 @@ class EndNight {
         .document('Game Settings')
         .collection('Night Values')
         .document('Villager Kill')
-        .updateData({
-      'villagerKill': findVillagerChoice(),
+        .setData({
+      'villagerKill': villagerChoice,
     });
   }
 
-  void killVampireChoice(sessionID) {
-    if (findVampireChoice() != false) {
-      Firestore.instance
-          .collection(sessionID)
-          .document(findVampireChoice())
-          .delete();
+  void killVampireChoice(sessionID, vampireChoice) {
+    if (vampireChoice != false) {
+      Firestore.instance.collection(sessionID).document(vampireChoice).delete();
     }
     Firestore.instance
         .collection(sessionID)
@@ -92,8 +83,8 @@ class EndNight {
         .document('Game Settings')
         .collection('Night Values')
         .document('Villager Kill')
-        .updateData({
-      'vampireKill': findVampireChoice(),
+        .setData({
+      'vampireKill': vampireChoice,
     });
   }
 }

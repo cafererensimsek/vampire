@@ -26,7 +26,11 @@ class _NightState extends State<Night> {
         // start the game, push the admin to first night
         onPressed: player.isAdmin
             ? () {
-                EndNight(sessionID);
+                var villagerChoice = EndNight(sessionID).findVillagerChoice();
+                EndNight(sessionID)
+                    .killVillagerChoice(sessionID, villagerChoice);
+                /* var vampireChoice = EndNight(sessionID).findVampireChoice();
+                EndNight(sessionID).killVampireChoice(sessionID, vampireChoice); */
                 Navigator.push(
                   context,
                   MaterialPageRoute(
