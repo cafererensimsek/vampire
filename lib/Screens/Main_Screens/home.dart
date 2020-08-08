@@ -80,7 +80,8 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: FittedBox(
-          child: Text('Welcome ${widget.user.email}'),
+          child: Text(
+              'Welcome ${widget.user.email.substring(0, widget.user.email.indexOf('@'))}'),
           fit: BoxFit.fitWidth,
         ),
         centerTitle: true,

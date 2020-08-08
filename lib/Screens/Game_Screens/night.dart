@@ -17,33 +17,16 @@ class _NightState extends State<Night> {
   final Player player;
   _NightState(this.sessionID, this.player);
 
-  Widget night(context, CollectionReference database, bool didVote, playerIDs) {
+  Widget night(context, CollectionReference database, List<String> playerIDs,
+      bool didVote, String votedFor) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text('Your role: ${player.role}')),
-
-        // reset votes
-        /* actions: [
-          IconButton(
-              icon: Icon(Icons.restore),
-              onPressed: player.isAdmin
-                  ? () {
-                      database
-                          .document('Game Settings')
-                          .collection('Night Values')
-                          .document('Villgaer Votes')
-                          .delete();
-                      database.getDocuments().then((snapshot) => {
-                            snapshot.documents.forEach((document) {
-                              document.updateData
-                            })
-                          });
-                    }
-                  : null),
-        ], */
+        title: Padding(
+          padding: const EdgeInsets.only(left: 15),
+          child: Text('Your role: ${player.role}'),
+        ),
       ),
       // create a listview of the current players
-      // automatically updated every time the state changes
       body: ListView(
         children: [
           for (String playerID in playerIDs)
@@ -54,18 +37,31 @@ class _NightState extends State<Night> {
                   child: Text(playerID),
                 ),
                 onTap: () {
-                  if (player.role == 'villager' && !didVote) {
+                  if (player.role == 'villager' &&
+                      !didVote &&
+                      playerID != player.name) {
                     database
                         .document('Game Settings')
                         .collection('Night Values')
                         .document('Villager Votes')
                         .setData({
-                      player.name: playerID,
-                    });
+                      playerID: FieldValue.increment(1),
+                    }, merge: true);
                     didVote = true;
+                    votedFor = playerID;
+                  } else if (player.role == 'villager' &&
+                      didVote &&
+                      votedFor != playerID &&
+                      playerID != player.name) {
                     database
-                        .document(player.name)
-                        .setData({'didVote': didVote}, merge: true);
+                        .document('Game Settings')
+                        .collection('Night Values')
+                        .document('Villager Votes')
+                        .setData({
+                      votedFor: FieldValue.increment(-1),
+                      playerID: FieldValue.increment(1),
+                    }, merge: true);
+                    votedFor = playerID;
                   }
                 },
                 leading: Padding(
@@ -103,8 +99,9 @@ class _NightState extends State<Night> {
             ? night(
                 context,
                 database,
-                false,
                 playerIDs,
+                false,
+                "",
               )
             : loading(context);
       },

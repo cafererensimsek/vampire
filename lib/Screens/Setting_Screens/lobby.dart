@@ -85,13 +85,17 @@ class _LobbyState extends State<Lobby> {
                       for (int i = 0;
                           i < snapshot.documents[0].data['vampireCount'];
                           i++) {
+                        String randomDocID = snapshot
+                            .documents[(1 +
+                                Random()
+                                    .nextInt(snapshot.documents.length - 1))]
+                            .documentID;
                         database
-                            .document(snapshot
-                                .documents[(1 +
-                                    Random().nextInt(
-                                        snapshot.documents.length - 1))]
-                                .documentID)
+                            .document(randomDocID)
                             .updateData({'role': 'vampire'});
+                        if (player.name == randomDocID) {
+                          player.role = 'vampire';
+                        }
                       }
                     });
                   }
