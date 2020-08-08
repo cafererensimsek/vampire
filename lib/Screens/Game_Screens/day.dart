@@ -45,10 +45,14 @@ class _DayState extends State<Day> {
         // start the game, push the admin to first night
         onPressed: player.isAdmin
             ? () {
+                Firestore.instance
+                    .collection(sessionID)
+                    .document('Game Settings')
+                    .setData({'didDayEnd': true}, merge: true);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => Day(
+                    builder: (context) => Night(
                       sessionID: sessionID,
                       player: player,
                     ),
