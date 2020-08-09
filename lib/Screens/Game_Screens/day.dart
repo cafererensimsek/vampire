@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:vampir/Classes/end_day.dart';
 import 'package:vampir/Classes/player.dart';
 import 'package:vampir/Screens/Game_Screens/night.dart';
+import 'package:vampir/Screens/Main_Screens/home.dart';
 
 class Day extends StatefulWidget {
   final String sessionID;
@@ -22,7 +24,7 @@ class _DayState extends State<Day> {
   @override
   Widget build(BuildContext context) {
     String villagerKill;
-    //String vampireKill;
+    String vampireKill;
 
     Firestore.instance
         .collection(sessionID)
@@ -32,32 +34,39 @@ class _DayState extends State<Day> {
         .get()
         .then((value) => villagerKill = value.data['Villager Kill']);
 
-/*     Firestore.instance
+    Firestore.instance
         .collection(sessionID)
         .document('Game Settings')
         .collection('Night Values')
         .document('Vampire Kill')
         .get()
-        .then((value) => vampireKill = value.data['Vampire Kill']); */
+        .then((value) => vampireKill = value.data['Vampire Kill']);
 
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         // start the game, push the admin to first night
         onPressed: player.isAdmin
             ? () {
-                Firestore.instance
-                    .collection(sessionID)
-                    .document('Game Settings')
-                    .setData({'didDayEnd': true}, merge: true);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Night(
-                      sessionID: sessionID,
-                      player: player,
+                EndDay().setSettings(sessionID);
+                if (player.name == villagerKill || player.name == vampireKill) {
+                  EndDay().setNewAdmin(sessionID);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Home(),
                     ),
-                  ),
-                );
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Night(
+                        sessionID: sessionID,
+                        player: player,
+                      ),
+                    ),
+                  );
+                }
               }
             : () {
                 Firestore.instance
@@ -66,6 +75,7 @@ class _DayState extends State<Day> {
                     .get()
                     .then((value) {
                   if (value.data['didDayEnd'] == true) {
+                    EndDay().setPlayerAdmin(sessionID, player);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -84,13 +94,13 @@ class _DayState extends State<Day> {
       appBar: AppBar(
         title: Padding(
           padding: const EdgeInsets.only(left: 25),
-          child: Text('It\'s Day. You are a ${player.role}'),
+          child: Text('It\'s Day. You are a ${player.role}.'),
         ),
       ),
       body: Column(
         children: [
           Text('Villagers killed: $villagerKill'),
-          //Text('Villagers killed: $vampireKill'),
+          Text('Villagers killed: $vampireKill'),
         ],
       ),
     );

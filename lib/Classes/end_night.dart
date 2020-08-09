@@ -1,10 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EndNight {
-  final String sessionID;
-
-  EndNight(this.sessionID);
-
   String findKey(Map<String, dynamic> map, int givenValue) {
     String keyToFind;
     map.forEach((key, value) {
@@ -15,38 +11,48 @@ class EndNight {
     return keyToFind;
   }
 
-  dynamic findVillagerChoice() {
-    Firestore.instance
+  Future<String> findVillagerChoice(sessionID) async {
+    String villagerChoice;
+    await Firestore.instance
         .collection(sessionID)
         .document('Game Settings')
         .collection('Night Values')
         .document('Villager Votes')
         .get()
         .then((value) {
-      List<int> votes = value.data.values.toList();
+      List votes = value.data.values.toList();
       votes.sort();
       votes = votes.reversed.toList();
-      return votes[0] > votes[1] ? findKey(value.data, votes[0]) : false;
+      votes.length > 0
+          ? villagerChoice = findKey(value.data, votes[0])
+          : villagerChoice = 'No choice was made!';
+      print(villagerChoice);
     });
+    print('fsafds $villagerChoice');
+    return villagerChoice;
   }
 
-  dynamic findVampireChoice() {
-    Firestore.instance
+  Future<String> findVampireChoice(sessionID) async {
+    String vampireChoice;
+    await Firestore.instance
         .collection(sessionID)
         .document('Game Settings')
         .collection('Night Values')
-        .document('Vamprie Votes')
+        .document('Vampire Votes')
         .get()
         .then((value) {
-      List<int> votes = value.data.values;
+      List votes = value.data.values.toList();
       votes.sort();
       votes = votes.reversed.toList();
-      return votes[0] > votes[1] ? findKey(value.data, votes[0]) : false;
+      votes.length > 0
+          ? vampireChoice = findKey(value.data, votes[0])
+          : vampireChoice = 'No choice was made!';
     });
+    return vampireChoice;
   }
 
   void killVillagerChoice(sessionID, villagerChoice) {
-    if (villagerChoice != false) {
+    if (villagerChoice != 'No choice was made!') {
       Firestore.instance
           .collection(sessionID)
           .document(villagerChoice)
@@ -55,36 +61,47 @@ class EndNight {
     Firestore.instance
         .collection(sessionID)
         .document('Game Settings')
-        .updateData({
-      'didNightEnd': true,
-    });
-    Firestore.instance
-        .collection(sessionID)
-        .document('Game Settings')
         .collection('Night Values')
         .document('Villager Kill')
         .setData({
       'villagerKill': villagerChoice,
     });
+    Firestore.instance
+        .collection(sessionID)
+        .document('Game Settings')
+        .collection('Night Values')
+        .document('Villager Votes')
+        .delete();
   }
 
   void killVampireChoice(sessionID, vampireChoice) {
-    if (vampireChoice != false) {
+    if (vampireChoice != 'No choice was made!') {
       Firestore.instance.collection(sessionID).document(vampireChoice).delete();
     }
     Firestore.instance
         .collection(sessionID)
         .document('Game Settings')
-        .updateData({
-      'didNightEnd': true,
+        .collection('Night Values')
+        .document('Vampire Kill')
+        .setData({
+      'vampireKill': vampireChoice,
     });
     Firestore.instance
         .collection(sessionID)
         .document('Game Settings')
         .collection('Night Values')
-        .document('Villager Kill')
-        .setData({
-      'vampireKill': vampireChoice,
+        .document('Vampire Votes')
+        .delete();
+  }
+
+  void setSettings(sessionID) {
+    Firestore.instance
+        .collection(sessionID)
+        .document('Game Settings')
+        .updateData({
+      'didNightEnd': true,
+      'didDayEnd': false,
+      'isInLobby': true,
     });
   }
 }

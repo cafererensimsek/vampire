@@ -25,12 +25,17 @@ class _NightState extends State<Night> {
       floatingActionButton: FloatingActionButton.extended(
         // start the game, push the admin to first night
         onPressed: player.isAdmin
-            ? () {
-                var villagerChoice = EndNight(sessionID).findVillagerChoice();
-                EndNight(sessionID)
-                    .killVillagerChoice(sessionID, villagerChoice);
-                /* var vampireChoice = EndNight(sessionID).findVampireChoice();
-                EndNight(sessionID).killVampireChoice(sessionID, vampireChoice); */
+            ? () async {
+                String villagerChoice =
+                    await EndNight().findVillagerChoice(sessionID);
+                EndNight().killVillagerChoice(sessionID, villagerChoice);
+
+                var vampireChoice =
+                    await EndNight().findVampireChoice(sessionID);
+                EndNight().killVampireChoice(sessionID, vampireChoice);
+
+                EndNight().setSettings(sessionID);
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -62,7 +67,7 @@ class _NightState extends State<Night> {
       appBar: AppBar(
         title: Padding(
           padding: const EdgeInsets.only(left: 15),
-          child: Text('It\'s Night. You are a ${player.role}'),
+          child: Text('It\'s Night. You are a ${player.role}.'),
         ),
       ),
       // create a listview of the current players

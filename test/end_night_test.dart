@@ -5,12 +5,13 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   group('end_night.dart', () {
     test('a non-null value should be returned', () {
-      final String result = EndNight('562823').findVillagerChoice();
-      expect(result, 'caferen');
+      String villagerChoice;
+      EndNight().findVillagerChoice('562823');
+      expect(villagerChoice, 'caferen');
     });
-    test('firestore data change is expected', () {
-      EndNight('562823').killVillagerChoice('562823', 'caferen');
-      expect('test', 'test');
+    test('a non-null value should be returned', () {
+      var result = EndNight().findKey({'caferen': 3}, 3);
+      expect(result, 'caferen');
     });
   });
 }
