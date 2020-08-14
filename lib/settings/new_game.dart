@@ -1,9 +1,7 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:vampir/Classes/create_player_list.dart';
-import 'package:vampir/Classes/player.dart';
-
+import '../classes.dart';
 import 'lobby.dart';
 
 class NewGame extends StatefulWidget {
@@ -40,8 +38,7 @@ class _NewGameState extends State<NewGame> {
                 isAlive: true,
                 role: 'villager');
             // creates a collection in firestore with the name sessionID
-            await CreateList(admin: admin, sessionID: sessionID)
-                .createCollection();
+            await HandleLobby().createGame(admin, sessionID);
             Firestore.instance
                 .collection(sessionID)
                 .document('Game Settings')

@@ -3,10 +3,10 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:vampir/Screens/Game_Screens/night.dart';
-import 'package:vampir/Screens/loading.dart';
-import 'package:vampir/Classes/player.dart';
 import 'package:provider/provider.dart';
+import 'package:vampir/game/night.dart';
+import '../classes.dart';
+import '../loading.dart';
 
 class Lobby extends StatefulWidget {
   final Player player;

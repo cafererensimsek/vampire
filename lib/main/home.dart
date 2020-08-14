@@ -2,10 +2,9 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:vampir/Classes/add_player.dart';
-import 'package:vampir/Screens/Setting_Screens/lobby.dart';
-import 'package:vampir/Screens/Setting_Screens/new_game.dart';
-import '../../Classes/player.dart';
+import 'package:vampir/settings/lobby.dart';
+import 'package:vampir/settings/new_game.dart';
+import '../classes.dart';
 
 class Home extends StatefulWidget {
   final FirebaseUser user;
@@ -58,8 +57,7 @@ class _HomeState extends State<Home> {
               isAlive: true,
               isAdmin: true,
               role: 'villager');
-          await AddPlayer(player: player, sessionID: sessionID)
-              .addPlayer(player);
+          await HandleLobby().addPlayer(player, sessionID);
           Navigator.push(
             context,
             MaterialPageRoute(

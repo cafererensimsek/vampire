@@ -1,9 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:vampir/Classes/player.dart';
-import 'package:vampir/Screens/loading.dart';
+import '../classes.dart';
+import '../loading.dart';
 import 'day.dart';
-import 'package:vampir/Classes/end_night.dart';
 
 class Night extends StatefulWidget {
   final String sessionID;
