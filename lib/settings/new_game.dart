@@ -1,7 +1,8 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../classes.dart';
+import 'package:vampir/classes/lobby_functions.dart';
+import '../classes/player.dart';
 import 'lobby.dart';
 
 class NewGame extends StatefulWidget {

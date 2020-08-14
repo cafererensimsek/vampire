@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:vampir/classes/day_end_functions.dart';
 import 'package:vampir/main/home.dart';
-import '../classes.dart';
+import '../classes/player.dart';
 import 'night.dart';
 
 class Day extends StatefulWidget {

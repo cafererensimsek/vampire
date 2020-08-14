@@ -5,8 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vampir/game/night.dart';
-import '../classes.dart';
-import '../loading.dart';
+import '../classes/player.dart';
+import '../classes/loading.dart';
 
 class Lobby extends StatefulWidget {
   final Player player;

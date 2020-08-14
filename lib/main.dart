@@ -1,5 +1,4 @@
 // Sign in/up and go to home page
-
 import 'package:flutter/material.dart';
 import 'main/auth.dart';
 
