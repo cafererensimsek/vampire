@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vampir/game/night.dart';
 import '../classes/player.dart';
-import '../classes/loading.dart';
+import '../classes/widgets.dart';
 
 class Lobby extends StatefulWidget {
   final Player player;
@@ -33,15 +33,16 @@ class _LobbyState extends State<Lobby> {
     return Firestore.instance.collection(sessionID).snapshots();
   }
 
-  // use a snapshot from the subscribed data to create a list of current
-  // players using the documentIDs
+  // use a snapshot from the subscribed data to create a map of current
+  // players using the documentIDs as keys and their privilege as values
   Widget playerListDisplay(context, CollectionReference database) {
     final currentPlayers = Provider.of<QuerySnapshot>(context);
-    List<String> playerIDs = [];
+    Map<String, String> players = {};
 
     currentPlayers.documents.forEach((element) {
       if (element.documentID != 'Game Settings') {
-        playerIDs.add(element.documentID);
+        String privilege = element.data['isAdmin'] ? 'Admin' : 'Player';
+        players[element.documentID] = privilege;
       }
     });
 
@@ -67,6 +68,9 @@ class _LobbyState extends State<Lobby> {
                         MaterialPageRoute(
                             builder: (context) =>
                                 Night(sessionID: sessionID, player: player)));
+                  } else {
+                    return Widgets()
+                        .snackbar('Wait for the admin to start the game!');
                   }
                 });
               },
@@ -93,6 +97,7 @@ class _LobbyState extends State<Lobby> {
                         database
                             .document(randomDocID)
                             .updateData({'role': 'vampire'});
+                        // TODO: this probably won't work
                         if (player.name == randomDocID) {
                           player.role = 'vampire';
                         }
@@ -111,6 +116,8 @@ class _LobbyState extends State<Lobby> {
                             .collection(sessionID)
                             .document(snapshot.documents[i].documentID)
                             .updateData({'role': 'villager'});
+                        // TODO: this also won't work
+                        player.role = 'villager';
                       }
                     });
                   }
@@ -122,20 +129,22 @@ class _LobbyState extends State<Lobby> {
       // automatically updated every time the state changes
       body: ListView(
         children: [
-          for (String playerID in playerIDs)
+          for (String playerID in players.keys)
             Card(
               child: ListTile(
                 title: Padding(
                   padding: const EdgeInsets.only(left: 20),
                   child: Text(playerID),
                 ),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: Text(players[playerID]),
+                ),
                 onTap: player.isAdmin
                     ? () {
                         database.document(playerID).delete();
                       }
-                    : () {
-                        print('non admin ${player.isAdmin} ${player.email}');
-                      },
+                    : null,
                 leading: Padding(
                   padding: const EdgeInsets.only(left: 10),
                   child: Icon(Icons.person),
@@ -161,7 +170,7 @@ class _LobbyState extends State<Lobby> {
         builder: (context, snapshot) {
           return snapshot.hasData
               ? playerListDisplay(context, database)
-              : loading(context);
+              : Widgets().loading(context);
         },
       ),
     );

@@ -1,6 +1,3 @@
-// Either create a new game or join one
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:vampir/classes/lobby_functions.dart';
 import 'package:vampir/settings/lobby.dart';
@@ -8,16 +5,19 @@ import 'package:vampir/settings/new_game.dart';
 import '../classes/player.dart';
 
 class Home extends StatefulWidget {
-  final FirebaseUser user;
-  const Home({Key key, this.user}) : super(key: key);
+  final Player player;
+  const Home({Key key, this.player}) : super(key: key);
 
   @override
-  _HomeState createState() => _HomeState();
+  _HomeState createState() => _HomeState(player);
 }
 
 class _HomeState extends State<Home> {
+  final Player player;
   final sessionIDController = TextEditingController();
   String sessionID;
+
+  _HomeState(this.player);
 
   @override
   void initState() {
@@ -35,65 +35,23 @@ class _HomeState extends State<Home> {
     sessionID = sessionIDController.text;
   }
 
-  Widget joinGame(context) {
-    return Column(children: [
-      SizedBox(height: 75),
-      TextField(
-        controller: sessionIDController,
-        decoration: InputDecoration(
-          hintText: 'Session ID',
-          icon: Icon(Icons.confirmation_number),
-        ),
-        keyboardType: TextInputType.number,
-      ),
-      SizedBox(height: 25),
-      // creates a new non-admin user and sends him to the lobby of the
-      // given sessionID
-      FlatButton(
-        onPressed: () async {
-          Player player = new Player(
-              name: widget.user.email
-                  .substring(0, widget.user.email.indexOf('@')),
-              email: widget.user.email,
-              isAlive: true,
-              isAdmin: true,
-              role: 'villager');
-          await HandleLobby().addPlayer(player, sessionID);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Lobby(
-                player: player,
-                sessionID: sessionID,
-              ),
-            ),
-          );
-        },
-        child: Text('Join a Game'),
-      ),
-    ]);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: FittedBox(
-          child: Text(
-              'Welcome ${widget.user.email.substring(0, widget.user.email.indexOf('@'))}'),
+          child: Text('Welcome ${player.name}'),
           fit: BoxFit.fitWidth,
         ),
         centerTitle: true,
       ),
       body: Scaffold(
         floatingActionButton: FloatingActionButton.extended(
-          // sends the user to the settings page with their email
           onPressed: () {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>
-                        NewGame(adminEmail: widget.user.email)));
+                    builder: (context) => NewGame(admin: player)));
           },
           label: Text('Create new game'),
           icon: Icon(Icons.add),
@@ -103,7 +61,34 @@ class _HomeState extends State<Home> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             SizedBox(height: 50),
-            joinGame(context),
+            Column(children: [
+              SizedBox(height: 75),
+              TextField(
+                controller: sessionIDController,
+                decoration: InputDecoration(
+                  hintText: 'Session ID',
+                  icon: Icon(Icons.confirmation_number),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              SizedBox(height: 25),
+              FlatButton(
+                onPressed: () async {
+                  player.isAdmin = false;
+                  await HandleLobby().addPlayer(player, sessionID);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Lobby(
+                        player: player,
+                        sessionID: sessionID,
+                      ),
+                    ),
+                  );
+                },
+                child: Text('Join a Game'),
+              ),
+            ]),
           ],
         ),
       ),

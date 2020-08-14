@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:vampir/classes/day_end_functions.dart';
+import 'package:vampir/classes/widgets.dart';
 import 'package:vampir/main/home.dart';
 import '../classes/player.dart';
 import 'night.dart';
@@ -44,12 +45,13 @@ class _DayState extends State<Day> {
 
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-        // start the game, push the admin to first night
+        label: Text('End the Day'),
+        shape: RoundedRectangleBorder(),
         onPressed: player.isAdmin
             ? () {
                 EndDay().setSettings(sessionID);
                 if (player.name == villagerKill || player.name == vampireKill) {
-                  EndDay().setNewAdmin(sessionID);
+                  EndDay().setNewAdmin(sessionID, villagerKill, vampireKill);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -75,21 +77,33 @@ class _DayState extends State<Day> {
                     .get()
                     .then((value) {
                   if (value.data['didDayEnd'] == true) {
-                    EndDay().setPlayerAdmin(sessionID, player);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Night(
-                          player: player,
-                          sessionID: sessionID,
+                    if (player.name != villagerKill ||
+                        player.name != vampireKill) {
+                      EndDay().setPlayerAdmin(sessionID, player);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Night(
+                            player: player,
+                            sessionID: sessionID,
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Home(
+                            player: player,
+                          ),
+                        ),
+                      );
+                    }
+                  } else {
+                    Widgets().snackbar('Wait for admin to end the night!');
                   }
                 });
               },
-        label: Text('End the Day'),
-        shape: RoundedRectangleBorder(),
       ),
       appBar: AppBar(
         title: Padding(

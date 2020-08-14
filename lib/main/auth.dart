@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
+import 'package:vampir/classes/player.dart';
+import 'package:vampir/classes/widgets.dart';
 import 'home.dart';
 
 class Authentication extends StatefulWidget {
@@ -14,20 +15,6 @@ class _AuthenticationState extends State<Authentication> {
   String email;
   String password;
 
-  // snackbar template to display errors
-  snackbar(txt) {
-    return SnackBar(
-      content: Row(
-        children: [
-          Icon(Icons.error_outline),
-          SizedBox(width: 30),
-          Flexible(child: Text(txt)),
-        ],
-      ),
-    );
-  }
-
-  // initState for controllers
   @override
   void initState() {
     super.initState();
@@ -35,7 +22,6 @@ class _AuthenticationState extends State<Authentication> {
     passwordController.addListener(_changePassword);
   }
 
-  // dispose for controllers
   @override
   void dispose() {
     emailController.dispose();
@@ -43,61 +29,12 @@ class _AuthenticationState extends State<Authentication> {
     super.dispose();
   }
 
-  // the functions to get email and password
   _changeEmail() {
     email = emailController.text;
   }
 
   _changePassword() {
     password = passwordController.text;
-  }
-
-  // firebase signup function
-  signUp() async {
-    try {
-      FirebaseUser user = (await FirebaseAuth.instance
-              .createUserWithEmailAndPassword(email: email, password: password))
-          .user;
-
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => Home(user: user)));
-    } catch (e) {
-      Scaffold.of(context).showSnackBar(snackbar(e.message));
-    }
-  }
-
-  // tries to log in, if user not found signs it up and sends to home page,
-  //if neither shows the error
-  Widget button() {
-    return Builder(
-      builder: (context) => FlatButton(
-        onPressed: () async {
-          try {
-            FirebaseUser user = (await FirebaseAuth.instance
-                    .signInWithEmailAndPassword(
-                        email: email, password: password))
-                .user;
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => Home(user: user)));
-          } catch (e) {
-            switch (e.code) {
-              case "ERROR_USER_NOT_FOUND":
-                if (password.length >= 6) {
-                  signUp();
-                } else {
-                  Scaffold.of(context).showSnackBar(
-                      snackbar('Password must be at least 6 characters!'));
-                }
-                break;
-              default:
-                Scaffold.of(context).showSnackBar(snackbar(e.message));
-                break;
-            }
-          }
-        },
-        child: Text('Sign In/Sign Up'),
-      ),
-    );
   }
 
   @override
@@ -118,7 +55,59 @@ class _AuthenticationState extends State<Authentication> {
             hintText: 'Password',
           ),
         ),
-        button(),
+        SizedBox(height: 20),
+        FlatButton(
+          onPressed: () async {
+            try {
+              FirebaseUser user = (await FirebaseAuth.instance
+                      .signInWithEmailAndPassword(
+                          email: email, password: password))
+                  .user;
+              Player player = new Player(
+                  name: user.email.substring(0, user.email.indexOf('@')),
+                  isAdmin: true,
+                  role: 'villager');
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => Home(player: player)));
+            } catch (e) {
+              switch (e.code) {
+                case "ERROR_USER_NOT_FOUND":
+                  if (password.length >= 6) {
+                    try {
+                      FirebaseUser user = (await FirebaseAuth.instance
+                              .createUserWithEmailAndPassword(
+                                  email: email, password: password))
+                          .user;
+                      Player player = new Player(
+                          name:
+                              user.email.substring(0, user.email.indexOf('@')),
+                          isAdmin: true,
+                          role: 'villager');
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Home(player: player)));
+                    } catch (e) {
+                      Scaffold.of(context)
+                          .showSnackBar(Widgets().snackbar(e.message));
+                    }
+                  } else {
+                    Scaffold.of(context).showSnackBar(Widgets()
+                        .snackbar('Password must be at least 6 characters!'));
+                  }
+                  break;
+                default:
+                  Scaffold.of(context)
+                      .showSnackBar(Widgets().snackbar(e.message));
+                  break;
+              }
+            }
+          },
+          color: Theme.of(context).accentColor,
+          child: Text('Sign In/Sign Up'),
+        ),
       ]),
     );
   }

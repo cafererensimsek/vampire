@@ -26,20 +26,21 @@ class EndDay {
         .delete();
   }
 
-  Future<void> setNewAdmin(sessionID) async {
+  Future<void> setNewAdmin(sessionID, villagerKill, vampireKill) async {
     await Firestore.instance
         .collection(sessionID)
         .getDocuments()
         .then((snapshot) {
-      for (int i = 0; i < snapshot.documents[0].data['vampireCount']; i++) {
-        String randomDocID = snapshot
-            .documents[(1 + Random().nextInt(snapshot.documents.length - 1))]
-            .documentID;
-        Firestore.instance
-            .collection(sessionID)
-            .document(randomDocID)
-            .updateData({'isAdmin': true});
+      String randomDocID = snapshot
+          .documents[(1 + Random().nextInt(snapshot.documents.length - 1))]
+          .documentID;
+      if (randomDocID == villagerKill || randomDocID == vampireKill) {
+        setNewAdmin(sessionID, villagerKill, vampireKill)
       }
+      Firestore.instance
+          .collection(sessionID)
+          .document(randomDocID)
+          .updateData({'isAdmin': true});
     });
   }
 

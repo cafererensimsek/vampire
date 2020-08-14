@@ -6,17 +6,17 @@ import '../classes/player.dart';
 import 'lobby.dart';
 
 class NewGame extends StatefulWidget {
-  final String adminEmail;
-  const NewGame({Key key, @required this.adminEmail}) : super(key: key);
+  final Player admin;
+  const NewGame({Key key, @required this.admin}) : super(key: key);
 
   @override
-  _NewGameState createState() => _NewGameState(this.adminEmail);
+  _NewGameState createState() => _NewGameState(this.admin);
 }
 
 class _NewGameState extends State<NewGame> {
-  final String adminEmail;
+  final Player admin;
 
-  _NewGameState(this.adminEmail);
+  _NewGameState(this.admin);
 
   var sessionID = Random().nextInt(1000000).toString();
   var numberOfVampires;
@@ -30,15 +30,7 @@ class _NewGameState extends State<NewGame> {
       ),
       body: Scaffold(
         floatingActionButton: FloatingActionButton.extended(
-          // creates an admin user and sends him to the lobby of his game
           onPressed: () async {
-            var admin = new Player(
-                name: adminEmail.substring(0, adminEmail.indexOf('@')),
-                email: adminEmail,
-                isAdmin: true,
-                isAlive: true,
-                role: 'villager');
-            // creates a collection in firestore with the name sessionID
             await HandleLobby().createGame(admin, sessionID);
             Firestore.instance
                 .collection(sessionID)
@@ -61,10 +53,9 @@ class _NewGameState extends State<NewGame> {
           icon: Icon(Icons.add),
           shape: RoundedRectangleBorder(),
         ),
-
-        // select the vampire count
         body: Center(
           child: DropdownButton<int>(
+            hint: Text('Number of Vampries'),
             value: numberOfVampires,
             icon: Icon(Icons.arrow_downward),
             iconSize: 24,

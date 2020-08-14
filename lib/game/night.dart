@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:vampir/classes/night_end_functions.dart';
 import '../classes/player.dart';
-import '../classes/loading.dart';
+import '../classes/widgets.dart';
 import 'day.dart';
 
 class Night extends StatefulWidget {
@@ -19,11 +19,10 @@ class _NightState extends State<Night> {
   final Player player;
   _NightState(this.sessionID, this.player);
 
-  Widget night(context, CollectionReference database, List<String> playerIDs,
-      bool didVote, String votedFor) {
+  Widget night(context, CollectionReference database,
+      Map<String, String> players, bool didVote, String votedFor) {
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-        // start the game, push the admin to first night
         onPressed: player.isAdmin
             ? () async {
                 String villagerChoice =
@@ -58,6 +57,8 @@ class _NightState extends State<Night> {
                         ),
                       ),
                     );
+                  } else {
+                    Widgets().snackbar('Wait for the admin to end the night!');
                   }
                 });
               },
@@ -73,12 +74,20 @@ class _NightState extends State<Night> {
       // create a listview of the current players
       body: ListView(
         children: [
-          for (String playerID in playerIDs)
+          for (String playerID in players.keys)
             Card(
               child: ListTile(
                 title: Padding(
                   padding: const EdgeInsets.only(left: 25),
                   child: Text(playerID),
+                ),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(left: 25),
+                  child: Text(players[playerID]),
+                ),
+                leading: Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Icon(Icons.person),
                 ),
                 onTap: () {
                   if (player.role == 'villager' &&
@@ -133,10 +142,6 @@ class _NightState extends State<Night> {
                     votedFor = playerID;
                   }
                 },
-                leading: Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Icon(Icons.person),
-                ),
               ),
             ),
         ],
@@ -148,17 +153,16 @@ class _NightState extends State<Night> {
   Widget build(BuildContext context) {
     CollectionReference database = Firestore.instance.collection(sessionID);
 
-    List<String> playerIDs = [];
-    Future<List<String>> getPlayers() async {
+    Map<String, String> players = {};
+    Future<void> getPlayers() async {
       QuerySnapshot docs =
           await Firestore.instance.collection(sessionID).getDocuments();
       docs.documents.forEach((element) {
         if (element.documentID != 'Game Settings') {
-          playerIDs.add(element.documentID);
+          String privilege = element.data['isAdmin'] ? 'Admin' : 'Player';
+          players[element.documentID] = privilege;
         }
       });
-
-      return playerIDs;
     }
 
     return FutureBuilder(
@@ -168,11 +172,11 @@ class _NightState extends State<Night> {
             ? night(
                 context,
                 database,
-                playerIDs,
+                snapshot.data,
                 false,
                 "",
               )
-            : loading(context);
+            : Widgets().loading(context);
       },
     );
   }
