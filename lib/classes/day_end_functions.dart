@@ -35,7 +35,7 @@ class EndDay {
           .documents[(1 + Random().nextInt(snapshot.documents.length - 1))]
           .documentID;
       if (randomDocID == villagerKill || randomDocID == vampireKill) {
-        setNewAdmin(sessionID, villagerKill, vampireKill)
+        setNewAdmin(sessionID, villagerKill, vampireKill);
       }
       Firestore.instance
           .collection(sessionID)
