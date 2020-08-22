@@ -97,7 +97,6 @@ class _LobbyState extends State<Lobby> {
                         database
                             .document(randomDocID)
                             .updateData({'role': 'vampire'});
-                        // TODO: this probably won't work
                         if (player.name == randomDocID) {
                           player.role = 'vampire';
                         }
@@ -116,7 +115,6 @@ class _LobbyState extends State<Lobby> {
                             .collection(sessionID)
                             .document(snapshot.documents[i].documentID)
                             .updateData({'role': 'villager'});
-                        // TODO: this also won't work
                         player.role = 'villager';
                       }
                     });

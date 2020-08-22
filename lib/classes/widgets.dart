@@ -29,4 +29,33 @@ class Widgets {
       ),
     );
   }
+
+  Widget textInput(
+      {TextEditingController controller,
+      String hintText,
+      Icon icon,
+      bool obscure = false}) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(10, 20, 20, 20),
+      child: TextField(
+        cursorColor: Colors.white,
+        controller: controller,
+        obscureText: obscure,
+        style: TextStyle(color: Colors.white),
+        keyboardType: obscure ? null : TextInputType.emailAddress,
+        decoration: InputDecoration(
+          hintText: hintText,
+          hintStyle: TextStyle(color: Colors.white),
+          icon: icon,
+          enabledBorder:
+              UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+          focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(5),
+              ),
+              borderSide: BorderSide(color: Colors.white)),
+        ),
+      ),
+    );
+  }
 }

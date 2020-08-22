@@ -12,8 +12,8 @@ class Authentication extends StatefulWidget {
 class _AuthenticationState extends State<Authentication> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  String email;
-  String password;
+  String _email;
+  String _password;
 
   @override
   void initState() {
@@ -30,38 +30,32 @@ class _AuthenticationState extends State<Authentication> {
   }
 
   _changeEmail() {
-    email = emailController.text;
+    _email = emailController.text;
   }
 
   _changePassword() {
-    password = passwordController.text;
+    _password = passwordController.text;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        TextField(
-          controller: emailController,
-          decoration:
-              InputDecoration(hintText: 'Email', icon: Icon(Icons.mail)),
-        ),
-        SizedBox(height: 20),
-        TextField(
-          controller: passwordController,
-          obscureText: true,
-          decoration: InputDecoration(
-            icon: Icon(Icons.vpn_key),
-            hintText: 'Password',
-          ),
-        ),
-        SizedBox(height: 20),
-        FlatButton(
-          onPressed: () async {
+  void auth() async {
+    try {
+      FirebaseUser user = (await FirebaseAuth.instance
+              .signInWithEmailAndPassword(email: _email, password: _password))
+          .user;
+      Player player = new Player(
+          name: user.email.substring(0, user.email.indexOf('@')),
+          isAdmin: true,
+          role: 'villager');
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => Home(player: player)));
+    } catch (e) {
+      switch (e.code) {
+        case "ERROR_USER_NOT_FOUND":
+          if (_password.length >= 6) {
             try {
               FirebaseUser user = (await FirebaseAuth.instance
-                      .signInWithEmailAndPassword(
-                          email: email, password: password))
+                      .createUserWithEmailAndPassword(
+                          email: _email, password: _password))
                   .user;
               Player player = new Player(
                   name: user.email.substring(0, user.email.indexOf('@')),
@@ -72,43 +66,49 @@ class _AuthenticationState extends State<Authentication> {
                   MaterialPageRoute(
                       builder: (context) => Home(player: player)));
             } catch (e) {
-              switch (e.code) {
-                case "ERROR_USER_NOT_FOUND":
-                  if (password.length >= 6) {
-                    try {
-                      FirebaseUser user = (await FirebaseAuth.instance
-                              .createUserWithEmailAndPassword(
-                                  email: email, password: password))
-                          .user;
-                      Player player = new Player(
-                          name:
-                              user.email.substring(0, user.email.indexOf('@')),
-                          isAdmin: true,
-                          role: 'villager');
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => Home(player: player)));
-                    } catch (e) {
-                      Scaffold.of(context)
-                          .showSnackBar(Widgets().snackbar(e.message));
-                    }
-                  } else {
-                    Scaffold.of(context).showSnackBar(Widgets()
-                        .snackbar('Password must be at least 6 characters!'));
-                  }
-                  break;
-                default:
-                  Scaffold.of(context)
-                      .showSnackBar(Widgets().snackbar(e.message));
-                  break;
-              }
+              Scaffold.of(context).showSnackBar(Widgets().snackbar(e.message));
             }
-          },
-          color: Theme.of(context).accentColor,
-          child: Text('Sign In/Sign Up'),
-        ),
-      ]),
+          } else {
+            Scaffold.of(context).showSnackBar(
+                Widgets().snackbar('Password must be at least 6 characters!'));
+          }
+          break;
+        default:
+          Scaffold.of(context).showSnackBar(Widgets().snackbar(e.message));
+          break;
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage('lib/assets/background.jpg'),
+              fit: BoxFit.cover)),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Widgets().textInput(
+              controller: emailController,
+              hintText: 'Email',
+              icon: Icon(Icons.email, color: Colors.white)),
+          Widgets().textInput(
+              controller: passwordController,
+              hintText: 'Password',
+              icon: Icon(Icons.vpn_key, color: Colors.white),
+              obscure: true),
+          RaisedButton(
+            color: Colors.transparent,
+            child: Text(
+              'Sign In/Sign Up',
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            onPressed: auth,
+          ),
+        ]),
+      ),
     );
   }
 }
