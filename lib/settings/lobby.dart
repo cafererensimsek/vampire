@@ -46,37 +46,34 @@ class _LobbyState extends State<Lobby> {
       }
     });
 
+    void startGame() {
+      if (player.isAdmin) {
+        database.document('Game Settings').updateData({
+          'isInLobby': false,
+        });
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    Night(sessionID: sessionID, player: player)));
+      } else {
+        database.document('Game Settings').get().then((value) {
+          if (value.data.containsValue(false)) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        Night(sessionID: sessionID, player: player)));
+          } else {
+            return Widgets().snackbar('Wait for the admin to start the game!');
+          }
+        });
+      }
+    }
+
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        // start the game, push the admin to first night
-        onPressed: player.isAdmin
-            ? () {
-                database.document('Game Settings').updateData({
-                  'isInLobby': false,
-                });
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            Night(sessionID: sessionID, player: player)));
-              }
-            : () {
-                database.document('Game Settings').get().then((value) {
-                  if (value.data.containsValue(false)) {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                Night(sessionID: sessionID, player: player)));
-                  } else {
-                    return Widgets()
-                        .snackbar('Wait for the admin to start the game!');
-                  }
-                });
-              },
-        label: Text('Start'),
-        shape: RoundedRectangleBorder(),
-      ),
+      floatingActionButton:
+          Widgets().floatingAction(onpressed: startGame, label: 'Start'),
       appBar: AppBar(
         title: Text("Session ID:$sessionID"),
         centerTitle: true,

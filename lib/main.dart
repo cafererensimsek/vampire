@@ -10,8 +10,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Vampire',
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
-        accentColor: Colors.redAccent,
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: Colors.white,
+          elevation: 10,
+          shape: RoundedRectangleBorder(),
+        ),
       ),
       home: Authentication(),
     );

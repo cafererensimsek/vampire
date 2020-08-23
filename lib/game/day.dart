@@ -43,68 +43,66 @@ class _DayState extends State<Day> {
         .get()
         .then((value) => vampireKill = value.data['Vampire Kill']);
 
+    void endDay() {
+      if (player.isAdmin) {
+        EndDay().setSettings(sessionID);
+        if (player.name == villagerKill || player.name == vampireKill) {
+          EndDay().setNewAdmin(sessionID, villagerKill, vampireKill);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Home(),
+            ),
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Night(
+                sessionID: sessionID,
+                player: player,
+              ),
+            ),
+          );
+        }
+      } else {
+        Firestore.instance
+            .collection(sessionID)
+            .document('Game Settings')
+            .get()
+            .then((value) {
+          if (value.data['didDayEnd'] == true) {
+            if (player.name != villagerKill || player.name != vampireKill) {
+              EndDay().setPlayerAdmin(sessionID, player);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Night(
+                    player: player,
+                    sessionID: sessionID,
+                  ),
+                ),
+              );
+            } else {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Home(
+                    player: player,
+                  ),
+                ),
+              );
+            }
+          } else {
+            Widgets().snackbar('Wait for admin to end the night!');
+          }
+        });
+      }
+    }
+
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        label: Text('End the Day'),
-        shape: RoundedRectangleBorder(),
-        onPressed: player.isAdmin
-            ? () {
-                EndDay().setSettings(sessionID);
-                if (player.name == villagerKill || player.name == vampireKill) {
-                  EndDay().setNewAdmin(sessionID, villagerKill, vampireKill);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Home(),
-                    ),
-                  );
-                } else {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Night(
-                        sessionID: sessionID,
-                        player: player,
-                      ),
-                    ),
-                  );
-                }
-              }
-            : () {
-                Firestore.instance
-                    .collection(sessionID)
-                    .document('Game Settings')
-                    .get()
-                    .then((value) {
-                  if (value.data['didDayEnd'] == true) {
-                    if (player.name != villagerKill ||
-                        player.name != vampireKill) {
-                      EndDay().setPlayerAdmin(sessionID, player);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Night(
-                            player: player,
-                            sessionID: sessionID,
-                          ),
-                        ),
-                      );
-                    } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Home(
-                            player: player,
-                          ),
-                        ),
-                      );
-                    }
-                  } else {
-                    Widgets().snackbar('Wait for admin to end the night!');
-                  }
-                });
-              },
-      ),
+      floatingActionButton:
+          Widgets().floatingAction(onpressed: endDay, label: 'End the Day'),
       appBar: AppBar(
         title: Padding(
           padding: const EdgeInsets.only(left: 25),

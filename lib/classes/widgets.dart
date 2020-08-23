@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -56,6 +58,18 @@ class Widgets {
               borderSide: BorderSide(color: Colors.white)),
         ),
       ),
+    );
+  }
+
+  Widget floatingAction(
+      {String label, IconData icon, Function onpressed, fontSize = 10}) {
+    return FloatingActionButton.extended(
+      label: Text(
+        label,
+        style: TextStyle(color: Colors.black),
+      ),
+      icon: Icon(icon, color: Colors.black),
+      onPressed: onpressed,
     );
   }
 }

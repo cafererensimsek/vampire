@@ -19,52 +19,49 @@ class _NightState extends State<Night> {
   final Player player;
   _NightState(this.sessionID, this.player);
 
+  void endNight(CollectionReference database) async {
+    if (player.isAdmin) {
+      String villagerChoice = await EndNight().findVillagerChoice(sessionID);
+      EndNight().killVillagerChoice(sessionID, villagerChoice);
+
+      var vampireChoice = await EndNight().findVampireChoice(sessionID);
+      EndNight().killVampireChoice(sessionID, vampireChoice);
+
+      EndNight().setSettings(sessionID);
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Day(
+            sessionID: sessionID,
+            player: player,
+          ),
+        ),
+      );
+    } else {
+      database.document('Game Settings').get().then((value) {
+        if (value.data['didNightEnd'] == true) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Day(
+                sessionID: sessionID,
+                player: player,
+              ),
+            ),
+          );
+        } else {
+          Widgets().snackbar('Wait for the admin to end the night!');
+        }
+      });
+    }
+  }
+
   Widget night(context, CollectionReference database,
       Map<String, String> players, bool didVote, String votedFor) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: player.isAdmin
-            ? () async {
-                String villagerChoice =
-                    await EndNight().findVillagerChoice(sessionID);
-                EndNight().killVillagerChoice(sessionID, villagerChoice);
-
-                var vampireChoice =
-                    await EndNight().findVampireChoice(sessionID);
-                EndNight().killVampireChoice(sessionID, vampireChoice);
-
-                EndNight().setSettings(sessionID);
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Day(
-                      sessionID: sessionID,
-                      player: player,
-                    ),
-                  ),
-                );
-              }
-            : () {
-                database.document('Game Settings').get().then((value) {
-                  if (value.data['didNightEnd'] == true) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Day(
-                          sessionID: sessionID,
-                          player: player,
-                        ),
-                      ),
-                    );
-                  } else {
-                    Widgets().snackbar('Wait for the admin to end the night!');
-                  }
-                });
-              },
-        label: Text('End the Night'),
-        shape: RoundedRectangleBorder(),
-      ),
+      floatingActionButton:
+          Widgets().floatingAction(onpressed: endNight, label: 'End the Night'),
       appBar: AppBar(
         title: Padding(
           padding: const EdgeInsets.only(left: 15),

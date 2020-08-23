@@ -36,59 +36,57 @@ class _HomeState extends State<Home> {
     sessionID = sessionIDController.text;
   }
 
+  void newGame() {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => NewGame(admin: player)));
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: FittedBox(
-          child: Text('Welcome ${player.name}'),
-          fit: BoxFit.fitWidth,
+    return Container(
+      decoration: BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage('lib/assets/background.jpg'),
+              fit: BoxFit.cover)),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        floatingActionButton: Widgets().floatingAction(
+          icon: Icons.add,
+          label: 'Create New Game',
+          onpressed: newGame,
         ),
-        centerTitle: true,
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage('lib/assets/background.jpg'),
-                fit: BoxFit.cover)),
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          floatingActionButton: FloatingActionButton.extended(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => NewGame(admin: player)));
-            },
-            label: Text('Create new game'),
-            icon: Icon(Icons.add),
-            shape: RoundedRectangleBorder(),
+        body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Text(
+            'Welcome, ${player.name}',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white, fontSize: 30),
           ),
-          body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Widgets().textInput(
-                hintText: 'Session ID',
-                icon: Icon(Icons.confirmation_number, color: Colors.white)),
-            FlatButton(
-              onPressed: () async {
-                player.isAdmin = false;
-                await HandleLobby().addPlayer(player, sessionID);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Lobby(
-                      player: player,
-                      sessionID: sessionID,
-                    ),
-                  ),
-                );
-              },
-              child: Text(
-                'Join a Game',
-                style: TextStyle(color: Colors.white, fontSize: 20),
-              ),
+          SizedBox(height: 150),
+          Widgets().textInput(
+              controller: sessionIDController,
+              hintText: 'Session ID',
+              icon: Icon(Icons.confirmation_number, color: Colors.white)),
+          SizedBox(height: 20),
+          FlatButton(
+            child: Text(
+              'Join the Game',
+              style: TextStyle(color: Colors.white, fontSize: 20),
             ),
-          ]),
-        ),
+            onPressed: () async {
+              player.isAdmin = false;
+              await HandleLobby().addPlayer(player, sessionID);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Lobby(
+                    player: player,
+                    sessionID: sessionID,
+                  ),
+                ),
+              );
+            },
+          ),
+        ]),
       ),
     );
   }
