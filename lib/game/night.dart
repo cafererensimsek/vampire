@@ -57,17 +57,13 @@ class _NightState extends State<Night> {
     }
   }
 
+  
+
   Widget night(context, CollectionReference database,
       Map<String, String> players, bool didVote, String votedFor) {
     return Scaffold(
       floatingActionButton:
           Widgets().floatingAction(onpressed: endNight, label: 'End the Night'),
-      appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.only(left: 15),
-          child: Text('It\'s Night. You are a ${player.role}.'),
-        ),
-      ),
       // create a listview of the current players
       body: ListView(
         children: [
