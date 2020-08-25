@@ -6,17 +6,15 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 class Widgets {
   // snackbar template to display errors
   Widget snackbar(txt) {
-    return Builder(builder: (BuildContext context) {
-      return SnackBar(
-        content: Row(
-          children: [
-            Icon(Icons.error_outline),
-            SizedBox(width: 30),
-            Flexible(child: Text(txt)),
-          ],
-        ),
-      );
-    });
+    return SnackBar(
+      content: Row(
+        children: [
+          Icon(Icons.error_outline),
+          SizedBox(width: 30),
+          Flexible(child: Text(txt)),
+        ],
+      ),
+    );
   }
 
   // loading spinkit
