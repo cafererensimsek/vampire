@@ -19,52 +19,49 @@ class _NightState extends State<Night> {
   final Player player;
   _NightState(this.sessionID, this.player);
 
-  void endNight(CollectionReference database) async {
-    if (player.isAdmin) {
-      String villagerChoice = await EndNight().findVillagerChoice(sessionID);
-      EndNight().killVillagerChoice(sessionID, villagerChoice);
-
-      var vampireChoice = await EndNight().findVampireChoice(sessionID);
-      EndNight().killVampireChoice(sessionID, vampireChoice);
-
-      EndNight().setSettings(sessionID);
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => Day(
-            sessionID: sessionID,
-            player: player,
-          ),
-        ),
-      );
-    } else {
-      database.document('Game Settings').get().then((value) {
-        if (value.data['didNightEnd'] == true) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Day(
-                sessionID: sessionID,
-                player: player,
-              ),
-            ),
-          );
-        } else {
-          Widgets().snackbar('Wait for the admin to end the night!');
-        }
-      });
-    }
-  }
-
-  
-
   Widget night(context, CollectionReference database,
       Map<String, String> players, bool didVote, String votedFor) {
     return Scaffold(
-      floatingActionButton:
-          Widgets().floatingAction(onpressed: endNight, label: 'End the Night'),
-      // create a listview of the current players
+      floatingActionButton: Widgets().floatingAction(
+          onpressed: () async {
+            if (player.isAdmin) {
+              String villagerChoice =
+                  await EndNight().findVillagerChoice(sessionID);
+              EndNight().killVillagerChoice(sessionID, villagerChoice);
+
+              var vampireChoice = await EndNight().findVampireChoice(sessionID);
+              EndNight().killVampireChoice(sessionID, vampireChoice);
+
+              EndNight().setSettings(sessionID);
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Day(
+                    sessionID: sessionID,
+                    player: player,
+                  ),
+                ),
+              );
+            } else {
+              database.document('Game Settings').get().then((value) {
+                if (value.data['didNightEnd'] == true) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Day(
+                        sessionID: sessionID,
+                        player: player,
+                      ),
+                    ),
+                  );
+                } else {
+                  Widgets().snackbar('Wait for the admin to end the night!');
+                }
+              });
+            }
+          },
+          label: 'End the Night'),
       body: ListView(
         children: [
           for (String playerID in players.keys)
@@ -146,8 +143,8 @@ class _NightState extends State<Night> {
   Widget build(BuildContext context) {
     CollectionReference database = Firestore.instance.collection(sessionID);
 
-    Map<String, String> players = {};
-    Future<void> getPlayers() async {
+    Future<Map<String, String>> getPlayers() async {
+      Map<String, String> players = {};
       QuerySnapshot docs =
           await Firestore.instance.collection(sessionID).getDocuments();
       docs.documents.forEach((element) {
@@ -156,6 +153,7 @@ class _NightState extends State<Night> {
           players[element.documentID] = privilege;
         }
       });
+      return players;
     }
 
     return FutureBuilder(

@@ -51,7 +51,8 @@ class _AuthenticationState extends State<Authentication> {
             Widgets().textInput(
                 controller: emailController,
                 hintText: 'Email',
-                icon: Icon(Icons.email, color: Colors.white)),
+                icon: Icon(Icons.email, color: Colors.white),
+                keyboardType: TextInputType.emailAddress),
             Widgets().textInput(
                 controller: passwordController,
                 hintText: 'Password',

@@ -34,7 +34,8 @@ class Widgets {
       {TextEditingController controller,
       String hintText,
       Icon icon,
-      bool obscure = false}) {
+      bool obscure = false,
+      TextInputType keyboardType}) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 20, 20, 20),
       child: TextField(
@@ -42,7 +43,7 @@ class Widgets {
         controller: controller,
         obscureText: obscure,
         style: TextStyle(color: Colors.white),
-        keyboardType: obscure ? null : TextInputType.emailAddress,
+        keyboardType: keyboardType,
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(color: Colors.white),
@@ -60,7 +61,11 @@ class Widgets {
   }
 
   Widget floatingAction(
-      {String label, IconData icon, Function onpressed, fontSize = 10}) {
+      {String label,
+      IconData icon,
+      Function onpressed,
+      num fontSize = 10,
+      BuildContext context}) {
     return FloatingActionButton.extended(
       label: Text(
         label,

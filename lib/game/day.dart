@@ -103,12 +103,6 @@ class _DayState extends State<Day> {
     return Scaffold(
       floatingActionButton:
           Widgets().floatingAction(onpressed: endDay, label: 'End the Day'),
-      appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.only(left: 25),
-          child: Text('It\'s Day. You are a ${player.role}.'),
-        ),
-      ),
       body: Column(
         children: [
           Text('Villagers killed: $villagerKill'),

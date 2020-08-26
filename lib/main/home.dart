@@ -65,7 +65,8 @@ class _HomeState extends State<Home> {
           Widgets().textInput(
               controller: sessionIDController,
               hintText: 'Session ID',
-              icon: Icon(Icons.confirmation_number, color: Colors.white)),
+              icon: Icon(Icons.confirmation_number, color: Colors.white),
+              keyboardType: TextInputType.number),
           SizedBox(height: 20),
           FlatButton(
             child: Text(
