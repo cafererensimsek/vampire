@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:vampir/classes/lobby_functions.dart';
 import 'package:vampir/classes/widgets.dart';
@@ -36,9 +37,58 @@ class _HomeState extends State<Home> {
     sessionID = sessionIDController.text;
   }
 
-  void newGame() {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => NewGame(admin: player)));
+  Future<bool> doesExist(String sessionID) async {
+    try {
+      Firestore.instance.collection(sessionID).getDocuments();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Widget joinGameButton(BuildContext context, String sessionID) {
+    return FlatButton(
+      child: Text(
+        'Join the Game',
+        style: TextStyle(color: Colors.white, fontSize: 20),
+      ),
+      onPressed: () async {
+        bool check = await doesExist(sessionID);
+        if (sessionID != null && check) {
+          player.isAdmin = false;
+          await addPlayer(player, sessionID);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Lobby(
+                player: player,
+                sessionID: sessionID,
+              ),
+            ),
+          );
+        } else {
+          Scaffold.of(context)
+              .showSnackBar(snackbar('Blank or invalid Session ID!'));
+        }
+      },
+    );
+  }
+
+  Widget newGameButton() {
+    return floatingAction(
+      icon: Icons.add,
+      label: 'Create New Game',
+      onpressed: () => Navigator.push(context,
+          MaterialPageRoute(builder: (context) => NewGame(admin: player))),
+    );
+  }
+
+  Widget sessionIdInput() {
+    return textInput(
+        controller: sessionIDController,
+        hintText: 'Session ID',
+        icon: Icon(Icons.confirmation_number, color: Colors.white),
+        keyboardType: TextInputType.number);
   }
 
   @override
@@ -50,44 +100,25 @@ class _HomeState extends State<Home> {
               fit: BoxFit.cover)),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        floatingActionButton: Widgets().floatingAction(
-          icon: Icons.add,
-          label: 'Create New Game',
-          onpressed: newGame,
-        ),
-        body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Text(
-            'Welcome, ${player.name}',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white, fontSize: 30),
-          ),
-          SizedBox(height: 150),
-          Widgets().textInput(
-              controller: sessionIDController,
-              hintText: 'Session ID',
-              icon: Icon(Icons.confirmation_number, color: Colors.white),
-              keyboardType: TextInputType.number),
-          SizedBox(height: 20),
-          FlatButton(
-            child: Text(
-              'Join the Game',
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-            onPressed: () async {
-              player.isAdmin = false;
-              await HandleLobby().addPlayer(player, sessionID);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Lobby(
-                    player: player,
-                    sessionID: sessionID,
-                  ),
+        floatingActionButton: newGameButton(),
+        body: Builder(
+          builder: (BuildContext context) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Welcome, ${player.name}',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white, fontSize: 30),
                 ),
-              );
-            },
-          ),
-        ]),
+                SizedBox(height: 150),
+                sessionIdInput(),
+                SizedBox(height: 20),
+                joinGameButton(context, sessionID),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

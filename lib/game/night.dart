@@ -22,7 +22,7 @@ class _NightState extends State<Night> {
   Widget night(context, CollectionReference database,
       Map<String, String> players, bool didVote, String votedFor) {
     return Scaffold(
-      floatingActionButton: Widgets().floatingAction(
+      floatingActionButton: floatingAction(
           onpressed: () async {
             if (player.isAdmin) {
               String villagerChoice =
@@ -56,7 +56,7 @@ class _NightState extends State<Night> {
                     ),
                   );
                 } else {
-                  Widgets().snackbar('Wait for the admin to end the night!');
+                  snackbar('Wait for the admin to end the night!');
                 }
               });
             }
@@ -167,7 +167,7 @@ class _NightState extends State<Night> {
                 false,
                 "",
               )
-            : Widgets().loading(context);
+            : loading(context);
       },
     );
   }

@@ -94,7 +94,7 @@ class _DayState extends State<Day> {
               );
             }
           } else {
-            Widgets().snackbar('Wait for admin to end the night!');
+            snackbar('Wait for admin to end the night!');
           }
         });
       }
@@ -102,7 +102,7 @@ class _DayState extends State<Day> {
 
     return Scaffold(
       floatingActionButton:
-          Widgets().floatingAction(onpressed: endDay, label: 'End the Day'),
+          floatingAction(onpressed: endDay, label: 'End the Day'),
       body: Column(
         children: [
           Text('Villagers killed: $villagerKill'),

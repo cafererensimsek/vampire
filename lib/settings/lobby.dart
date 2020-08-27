@@ -65,7 +65,7 @@ class _LobbyState extends State<Lobby> {
                     builder: (context) =>
                         Night(sessionID: sessionID, player: player)));
           } else {
-            return Widgets().snackbar('Wait for the admin to start the game!');
+            return snackbar('Wait for the admin to start the game!');
           }
         });
       }
@@ -73,7 +73,7 @@ class _LobbyState extends State<Lobby> {
 
     return Scaffold(
       floatingActionButton:
-          Widgets().floatingAction(onpressed: startGame, label: 'Start'),
+          floatingAction(onpressed: startGame, label: 'Start'),
       appBar: AppBar(
         title: Text("Session ID:$sessionID"),
         centerTitle: true,
@@ -165,7 +165,7 @@ class _LobbyState extends State<Lobby> {
         builder: (context, snapshot) {
           return snapshot.hasData
               ? playerListDisplay(context, database)
-              : Widgets().loading(context);
+              : loading(context);
         },
       ),
     );
