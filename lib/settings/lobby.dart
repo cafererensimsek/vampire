@@ -57,23 +57,25 @@ class _LobbyState extends State<Lobby> {
                 builder: (context) =>
                     Night(sessionID: sessionID, player: player)));
       } else {
-        database.document('Game Settings').get().then((value) {
-          if (value.data.containsValue(false)) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        Night(sessionID: sessionID, player: player)));
-          } else {
-            return snackbar('Wait for the admin to start the game!');
-          }
-        });
+        database.document('Game Settings').get().then(
+          (value) {
+            if (value.data.containsValue(false)) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          Night(sessionID: sessionID, player: player)));
+            } else {
+              return snackbar('Wait for the admin to start the game!');
+            }
+          },
+        );
       }
     }
 
     return Scaffold(
-      floatingActionButton:
-          floatingAction(onpressed: startGame, label: 'Start'),
+      floatingActionButton: floatingAction(
+          onpressed: startGame, label: 'Start', icon: Icons.arrow_forward_ios),
       appBar: AppBar(
         title: Text("Session ID:$sessionID"),
         centerTitle: true,
@@ -82,23 +84,25 @@ class _LobbyState extends State<Lobby> {
             icon: Icon(Icons.shuffle),
             onPressed: player.isAdmin
                 ? () {
-                    database.getDocuments().then((snapshot) {
-                      for (int i = 0;
-                          i < snapshot.documents[0].data['vampireCount'];
-                          i++) {
-                        String randomDocID = snapshot
-                            .documents[(1 +
-                                Random()
-                                    .nextInt(snapshot.documents.length - 1))]
-                            .documentID;
-                        database
-                            .document(randomDocID)
-                            .updateData({'role': 'vampire'});
-                        if (player.name == randomDocID) {
-                          player.role = 'vampire';
+                    database.getDocuments().then(
+                      (snapshot) {
+                        for (int i = 0;
+                            i < snapshot.documents[0].data['vampireCount'];
+                            i++) {
+                          String randomDocID = snapshot
+                              .documents[(1 +
+                                  Random()
+                                      .nextInt(snapshot.documents.length - 1))]
+                              .documentID;
+                          database
+                              .document(randomDocID)
+                              .updateData({'role': 'vampire'});
+                          if (player.name == randomDocID) {
+                            player.role = 'vampire';
+                          }
                         }
-                      }
-                    });
+                      },
+                    );
                   }
                 : null,
           ),

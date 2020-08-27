@@ -45,9 +45,9 @@ class _DayState extends State<Day> {
 
     void endDay() {
       if (player.isAdmin) {
-        EndDay().setSettings(sessionID);
+        setSettings(sessionID);
         if (player.name == villagerKill || player.name == vampireKill) {
-          EndDay().setNewAdmin(sessionID, villagerKill, vampireKill);
+          setNewAdmin(sessionID, villagerKill, vampireKill);
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -73,7 +73,7 @@ class _DayState extends State<Day> {
             .then((value) {
           if (value.data['didDayEnd'] == true) {
             if (player.name != villagerKill || player.name != vampireKill) {
-              EndDay().setPlayerAdmin(sessionID, player);
+              setPlayerAdmin(sessionID, player);
               Navigator.push(
                 context,
                 MaterialPageRoute(
