@@ -9,15 +9,6 @@ class Vampire extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Vampire',
-      theme: ThemeData(
-        primaryColor: Colors.cyan[800],
-        accentColor: Colors.deepPurple,
-        floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: Colors.white,
-          elevation: 10,
-          shape: RoundedRectangleBorder(),
-        ),
-      ),
       home: Authentication(),
     );
   }

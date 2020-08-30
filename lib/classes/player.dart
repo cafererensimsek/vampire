@@ -7,7 +7,7 @@ class Player {
 
   Player({
     @required this.name,
-    @required this.isAdmin,
-    @required this.role,
+    this.isAdmin = true,
+    this.role = 'vampire',
   });
 }

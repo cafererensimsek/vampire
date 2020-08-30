@@ -43,25 +43,21 @@ class _AuthenticationState extends State<Authentication> {
         FirebaseUser user = (await FirebaseAuth.instance
                 .signInWithEmailAndPassword(email: _email, password: _password))
             .user;
-        Player player = new Player(
-            name: user.email.substring(0, user.email.indexOf('@')),
-            isAdmin: true,
-            role: 'villager');
+        Player player =
+            Player(name: user.email.substring(0, user.email.indexOf('@')));
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => Home(player: player)));
       } catch (e) {
         switch (e.code) {
           case "ERROR_USER_NOT_FOUND":
-            if (_password.length >= 6) {
+            if (_password.length > 5) {
               try {
                 FirebaseUser user = (await FirebaseAuth.instance
                         .createUserWithEmailAndPassword(
                             email: _email, password: _password))
                     .user;
                 Player player = new Player(
-                    name: user.email.substring(0, user.email.indexOf('@')),
-                    isAdmin: true,
-                    role: 'villager');
+                    name: user.email.substring(0, user.email.indexOf('@')));
                 Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -71,7 +67,7 @@ class _AuthenticationState extends State<Authentication> {
               }
             } else {
               Scaffold.of(context).showSnackBar(
-                  snackbar('Password must be at least 6 characters!'));
+                  snackbar('Password must be at least 6 characters long!'));
             }
             break;
           default:

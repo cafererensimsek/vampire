@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -15,7 +14,7 @@ Widget snackbar(txt) {
   );
 }
 
-// loading spinkit
+
 Widget loading(context) {
   return Scaffold(
     backgroundColor: Theme.of(context).accentColor,
@@ -34,8 +33,9 @@ Widget textInput(
     Icon icon,
     bool obscure = false,
     TextInputType keyboardType}) {
-  return Padding(
+  return Container(
     padding: const EdgeInsets.fromLTRB(10, 20, 20, 20),
+    
     child: TextField(
       cursorColor: Colors.white,
       controller: controller,

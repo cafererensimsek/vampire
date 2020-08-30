@@ -8,6 +8,7 @@
 .buildlog/
 .history
 .svn/
+vampir design.xd
 
 # IntelliJ related
 *.iml
