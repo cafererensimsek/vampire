@@ -80,7 +80,7 @@ class _HomeState extends State<Home> {
     return RaisedButton(
       color: Colors.black,
       textColor: Colors.white,
-      child: Text('Start the Game'),
+      child: Text('Go to the Lobby'),
       onPressed: () async {
         if (numberOfVampires != null) {
           await createGame(player, newSessionID);
@@ -149,20 +149,23 @@ class _HomeState extends State<Home> {
       elevation: 10,
       context: context,
       builder: (BuildContext context) {
-        return Column(
-          children: [
-            SizedBox(height: 100),
-            Text(
-              'Select the Number of Vampires',
-              style: TextStyle(
-                fontSize: 20,
+        return Container(
+          height: 225,
+          child: Column(
+            children: [
+              SizedBox(height: 25),
+              Text(
+                'Select the Number of Vampires',
+                style: TextStyle(
+                  fontSize: 20,
+                ),
               ),
-            ),
-            SizedBox(height: 10),
-            dropdownMenu(),
-            SizedBox(height: 50),
-            startGameButton(newSessionID, context),
-          ],
+              SizedBox(height: 10),
+              dropdownMenu(),
+              SizedBox(height: 50),
+              startGameButton(newSessionID, context),
+            ],
+          ),
         );
       },
     );
@@ -171,6 +174,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       backgroundColor: Colors.transparent,
       floatingActionButton: Builder(
         builder: (BuildContext context) {

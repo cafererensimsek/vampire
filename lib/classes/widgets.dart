@@ -63,6 +63,7 @@ Widget floatingAction(
     num fontSize = 10,
     BuildContext context}) {
   return FloatingActionButton.extended(
+    elevation: 10,
     label: Text(
       label,
       style: TextStyle(color: Colors.black),
