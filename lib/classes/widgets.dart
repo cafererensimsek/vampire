@@ -14,7 +14,6 @@ Widget snackbar(txt) {
   );
 }
 
-
 Widget loading(context) {
   return Scaffold(
     backgroundColor: Theme.of(context).accentColor,
@@ -33,9 +32,8 @@ Widget textInput(
     Icon icon,
     bool obscure = false,
     TextInputType keyboardType}) {
-  return Container(
-    padding: const EdgeInsets.fromLTRB(10, 20, 20, 20),
-    
+  return Padding(
+    padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
     child: TextField(
       cursorColor: Colors.white,
       controller: controller,

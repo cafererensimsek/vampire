@@ -35,7 +35,7 @@ class _NightState extends State<Night> {
 
             setSettings(sessionID);
 
-            Navigator.push(
+            /* Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => Day(
@@ -43,11 +43,11 @@ class _NightState extends State<Night> {
                   player: player,
                 ),
               ),
-            );
+            ); */
           } else {
             database.document('Game Settings').get().then((value) {
               if (value.data['didNightEnd'] == true) {
-                Navigator.push(
+                /* Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => Day(
@@ -55,7 +55,7 @@ class _NightState extends State<Night> {
                       player: player,
                     ),
                   ),
-                );
+                ); */
               } else {
                 snackbar('Wait for the admin to end the night!');
               }

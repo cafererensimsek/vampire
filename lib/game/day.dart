@@ -2,28 +2,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:vampir/classes/day_end_functions.dart';
 import 'package:vampir/classes/widgets.dart';
-import 'package:vampir/main/home.dart';
+import 'package:vampir/home.dart';
 import '../classes/player.dart';
 import 'night.dart';
 
 class Day extends StatefulWidget {
-  final String sessionID;
-  final Player player;
-
-  const Day({Key key, this.sessionID, this.player}) : super(key: key);
-
   @override
-  _DayState createState() => _DayState(sessionID, player);
+  _DayState createState() => _DayState();
 }
 
 class _DayState extends State<Day> {
-  final String sessionID;
-  final Player player;
-
-  _DayState(this.sessionID, this.player);
-
   @override
   Widget build(BuildContext context) {
+    final Map arguments = ModalRoute.of(context).settings.arguments as Map;
+    String sessionID = arguments['SessionID'];
+    Player player = arguments['player'];
     String villagerKill;
     String vampireKill;
 
