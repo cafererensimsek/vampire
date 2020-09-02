@@ -1,10 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:vampir/classes/day_end_functions.dart';
+import 'package:vampir/classes/day_functions.dart';
 import 'package:vampir/classes/widgets.dart';
 import 'package:vampir/home.dart';
 import '../classes/player.dart';
-import 'night.dart';
 
 class Day extends StatefulWidget {
   @override
@@ -48,15 +47,8 @@ class _DayState extends State<Day> {
             ),
           );
         } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Night(
-                sessionID: sessionID,
-                player: player,
-              ),
-            ),
-          );
+          Navigator.pushNamedAndRemoveUntil(context, '/night', (route) => false,
+              arguments: {'sessionID': sessionID, 'player': player});
         }
       } else {
         Firestore.instance
@@ -67,24 +59,13 @@ class _DayState extends State<Day> {
           if (value.data['didDayEnd'] == true) {
             if (player.name != villagerKill || player.name != vampireKill) {
               setPlayerAdmin(sessionID, player);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Night(
-                    player: player,
-                    sessionID: sessionID,
-                  ),
-                ),
-              );
+              Navigator.pushNamedAndRemoveUntil(
+                  context, '/night', (route) => false,
+                  arguments: {'sessionID': sessionID, 'player': player});
             } else {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Home(
-                    player: player,
-                  ),
-                ),
-              );
+              Navigator.pushNamedAndRemoveUntil(
+                  context, '/night', (route) => false,
+                  arguments: {'sessionID': sessionID, 'player': player});
             }
           } else {
             snackbar('Wait for admin to end the night!');

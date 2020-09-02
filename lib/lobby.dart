@@ -1,10 +1,7 @@
-// Arrange the players, assing the roles and start the game
-
-import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:vampir/game/night.dart';
+import 'classes/lobby_functions.dart';
 import 'classes/player.dart';
 import 'classes/widgets.dart';
 
@@ -12,11 +9,8 @@ class Lobby extends StatefulWidget {
   final Player player;
   final String sessionID;
 
-  const Lobby({
-    Key key,
-    @required this.player,
-    @required this.sessionID,
-  }) : super(key: key);
+  const Lobby({Key key, @required this.player, @required this.sessionID})
+      : super(key: key);
   @override
   _LobbyState createState() =>
       _LobbyState(player: player, sessionID: sessionID);
@@ -28,13 +22,10 @@ class _LobbyState extends State<Lobby> {
 
   _LobbyState({this.player, this.sessionID});
 
-  // subscribe to the data stream of the collection with the sessionID
   Stream<QuerySnapshot> get currentPlayers {
     return Firestore.instance.collection(sessionID).snapshots();
   }
 
-  // use a snapshot from the subscribed data to create a map of current
-  // players using the documentIDs as keys and their privilege as values
   Widget playerListDisplay(context, CollectionReference database) {
     final currentPlayers = Provider.of<QuerySnapshot>(context);
     Map<String, String> players = {};
@@ -46,86 +37,29 @@ class _LobbyState extends State<Lobby> {
       }
     });
 
-    void startGame() {
-      if (player.isAdmin) {
-        database.document('Game Settings').updateData({
-          'isInLobby': false,
-        });
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    Night(sessionID: sessionID, player: player)));
-      } else {
-        database.document('Game Settings').get().then(
-          (value) {
-            if (value.data.containsValue(false)) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          Night(sessionID: sessionID, player: player)));
-            } else {
-              return snackbar('Wait for the admin to start the game!');
-            }
-          },
-        );
-      }
-    }
-
     return Scaffold(
+      extendBodyBehindAppBar: true,
       floatingActionButton: floatingAction(
-          onpressed: startGame, label: 'Start', icon: Icons.arrow_forward_ios),
+          onpressed: () => startGame(database, player, context, sessionID),
+          label: 'Start',
+          icon: Icons.arrow_forward_ios),
       appBar: AppBar(
         title: Text("Session ID:$sessionID"),
         centerTitle: true,
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.shuffle),
-            onPressed: player.isAdmin
-                ? () {
-                    database.getDocuments().then(
-                      (snapshot) {
-                        for (int i = 0;
-                            i < snapshot.documents[0].data['vampireCount'];
-                            i++) {
-                          String randomDocID = snapshot
-                              .documents[(1 +
-                                  Random()
-                                      .nextInt(snapshot.documents.length - 1))]
-                              .documentID;
-                          database
-                              .document(randomDocID)
-                              .updateData({'role': 'vampire'});
-                          if (player.name == randomDocID) {
-                            player.role = 'vampire';
-                          }
-                        }
-                      },
-                    );
-                  }
-                : null,
+            onPressed:
+                player.isAdmin ? () => assignRoles(database, player) : null,
           ),
           IconButton(
             icon: Icon(Icons.restore),
             onPressed: player.isAdmin
-                ? () {
-                    database.getDocuments().then((snapshot) {
-                      for (int i = 1; i < snapshot.documents.length; i++) {
-                        Firestore.instance
-                            .collection(sessionID)
-                            .document(snapshot.documents[i].documentID)
-                            .updateData({'role': 'villager'});
-                        player.role = 'villager';
-                      }
-                    });
-                  }
+                ? () => resetRoles(database, sessionID, player)
                 : null,
           ),
         ],
       ),
-      // create a listview of the current players
-      // automatically updated every time the state changes
       body: ListView(
         children: [
           for (String playerID in players.keys)
