@@ -44,6 +44,7 @@ class _HomeState extends State<Home> {
       Firestore.instance.collection(sessionID).getDocuments();
       return true;
     } catch (e) {
+      print(e.message);
       return false;
     }
   }
@@ -80,7 +81,7 @@ class _HomeState extends State<Home> {
     return RaisedButton(
       color: Colors.black,
       textColor: Colors.white,
-      child: Text('Go to the Lobby'),
+      child: Text('Create'),
       onPressed: () async {
         if (numberOfVampires != null) {
           await createGame(player, newSessionID);
@@ -174,7 +175,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       backgroundColor: Colors.transparent,
       floatingActionButton: Builder(
         builder: (BuildContext context) {
@@ -187,22 +188,25 @@ class _HomeState extends State<Home> {
       ),
       body: Builder(
         builder: (BuildContext context) {
-          return Column(
-            children: [
-              SizedBox(height: 200),
-              Text(
-                'Welcome, ${player.name}',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white, fontSize: 30),
-              ),
-              SizedBox(height: 75),
-              textInput(
-                  controller: sessionIDController,
-                  hintText: 'Session ID',
-                  //icon: Icon(Icons.confirmation_number, color: Colors.white),
-                  keyboardType: TextInputType.number),
-              joinGameButton(context, sessionID),
-            ],
+          return SingleChildScrollView(
+            physics: NeverScrollableScrollPhysics(),
+            child: Column(
+              children: [
+                SizedBox(height: 200),
+                Text(
+                  'Welcome, ${player.name}',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white, fontSize: 30),
+                ),
+                SizedBox(height: 75),
+                textInput(
+                    controller: sessionIDController,
+                    hintText: 'Session ID',
+                    //icon: Icon(Icons.confirmation_number, color: Colors.white),
+                    keyboardType: TextInputType.number),
+                joinGameButton(context, sessionID),
+              ],
+            ),
           );
         },
       ),

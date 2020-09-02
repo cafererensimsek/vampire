@@ -11,13 +11,14 @@ class Night extends StatefulWidget {
 
 class _NightState extends State<Night> {
   Widget night(
-      context,
-      CollectionReference database,
-      Map<String, String> players,
-      bool didVote,
-      String votedFor,
-      String sessionID,
-      Player player) {
+    context,
+    CollectionReference database,
+    Map<String, String> players,
+    bool didVote,
+    String votedFor,
+    String sessionID,
+    Player player,
+  ) {
     return Scaffold(
       floatingActionButton: floatingAction(
           label: 'End the Night',
@@ -52,7 +53,7 @@ class _NightState extends State<Night> {
   @override
   Widget build(BuildContext context) {
     final Map arguments = ModalRoute.of(context).settings.arguments as Map;
-    String sessionID = arguments['SessionID'];
+    String sessionID = arguments['sessionID'];
     Player player = arguments['player'];
     CollectionReference database = Firestore.instance.collection(sessionID);
 

@@ -38,7 +38,7 @@ class _LobbyState extends State<Lobby> {
     });
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.black,
       floatingActionButton: floatingAction(
           onpressed: () => startGame(database, player, context, sessionID),
           label: 'Start',
@@ -64,14 +64,16 @@ class _LobbyState extends State<Lobby> {
         children: [
           for (String playerID in players.keys)
             Card(
+              color: Theme.of(context).primaryColor,
               child: ListTile(
                 title: Padding(
                   padding: const EdgeInsets.only(left: 20),
-                  child: Text(playerID),
+                  child: Text(playerID, style: TextStyle(color: Colors.white)),
                 ),
                 subtitle: Padding(
                   padding: const EdgeInsets.only(left: 20),
-                  child: Text(players[playerID]),
+                  child: Text(players[playerID],
+                      style: TextStyle(color: Colors.white)),
                 ),
                 onTap: player.isAdmin
                     ? () {
@@ -80,11 +82,11 @@ class _LobbyState extends State<Lobby> {
                     : null,
                 leading: Padding(
                   padding: const EdgeInsets.only(left: 10),
-                  child: Icon(Icons.person),
+                  child: Icon(Icons.person, color: Colors.white),
                 ),
                 trailing: Padding(
                   padding: const EdgeInsets.only(right: 10),
-                  child: Icon(Icons.delete),
+                  child: Icon(Icons.delete, color: Colors.white),
                 ),
               ),
             ),

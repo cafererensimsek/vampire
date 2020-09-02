@@ -8,6 +8,6 @@ class Player {
   Player({
     @required this.name,
     this.isAdmin = true,
-    this.role = 'vampire',
+    this.role = 'villager',
   });
 }
