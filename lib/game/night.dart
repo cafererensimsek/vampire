@@ -20,10 +20,15 @@ class _NightState extends State<Night> {
     Player player,
   ) {
     return Scaffold(
-      floatingActionButton: floatingAction(
-          label: 'End the Night',
-          icon: Icons.arrow_forward_ios,
-          onpressed: () => endNight(player, sessionID, context, database)),
+      floatingActionButton: Builder(
+        builder: (BuildContext context) {
+          return floatingAction(
+            label: 'End the Night',
+            icon: Icons.arrow_forward_ios,
+            onpressed: () => endNight(player, sessionID, context, database),
+          );
+        },
+      ),
       body: ListView(
         children: [
           for (String playerID in players.keys)

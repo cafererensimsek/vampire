@@ -36,7 +36,9 @@ class _HomeState extends State<Home> {
   }
 
   _changeSessionID() {
-    sessionID = sessionIDController.text;
+    setState(() {
+      sessionID = sessionIDController.text;
+    });
   }
 
   Future<bool> doesExist(String sessionID) async {
@@ -44,7 +46,6 @@ class _HomeState extends State<Home> {
       Firestore.instance.collection(sessionID).getDocuments();
       return true;
     } catch (e) {
-      print(e.message);
       return false;
     }
   }
@@ -175,8 +176,8 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      backgroundColor: Colors.transparent,
       floatingActionButton: Builder(
         builder: (BuildContext context) {
           return floatingAction(
@@ -200,10 +201,11 @@ class _HomeState extends State<Home> {
                 ),
                 SizedBox(height: 75),
                 textInput(
-                    controller: sessionIDController,
-                    hintText: 'Session ID',
-                    //icon: Icon(Icons.confirmation_number, color: Colors.white),
-                    keyboardType: TextInputType.number),
+                  controller: sessionIDController,
+                  hintText: 'Session ID',
+                  //icon: Icon(Icons.confirmation_number, color: Colors.white),
+                  keyboardType: TextInputType.number,
+                ),
                 joinGameButton(context, sessionID),
               ],
             ),
