@@ -107,7 +107,7 @@ class _AuthenticationState extends State<Authentication> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.black,
       body: SingleChildScrollView(
         child: Builder(builder: (BuildContext context) {
           return Column(children: [
