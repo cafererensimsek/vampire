@@ -19,61 +19,6 @@ class _DayState extends State<Day> {
     String villagerKill;
     String vampireKill;
 
-    Firestore.instance
-        .collection(sessionID)
-        .document('Game Settings')
-        .collection('Night Values')
-        .document('Villager Kill')
-        .get()
-        .then((value) => villagerKill = value.data['Villager Kill']);
-
-    Firestore.instance
-        .collection(sessionID)
-        .document('Game Settings')
-        .collection('Night Values')
-        .document('Vampire Kill')
-        .get()
-        .then((value) => vampireKill = value.data['Vampire Kill']);
-
-    void endDay() {
-      if (player.isAdmin) {
-        setSettings(sessionID);
-        if (player.name == villagerKill || player.name == vampireKill) {
-          setNewAdmin(sessionID, villagerKill, vampireKill);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Home(),
-            ),
-          );
-        } else {
-          Navigator.pushNamedAndRemoveUntil(context, '/night', (route) => false,
-              arguments: {'sessionID': sessionID, 'player': player});
-        }
-      } else {
-        Firestore.instance
-            .collection(sessionID)
-            .document('Game Settings')
-            .get()
-            .then((value) {
-          if (value.data['didDayEnd'] == true) {
-            if (player.name != villagerKill || player.name != vampireKill) {
-              setPlayerAdmin(sessionID, player);
-              Navigator.pushNamedAndRemoveUntil(
-                  context, '/night', (route) => false,
-                  arguments: {'sessionID': sessionID, 'player': player});
-            } else {
-              Navigator.pushNamedAndRemoveUntil(
-                  context, '/night', (route) => false,
-                  arguments: {'sessionID': sessionID, 'player': player});
-            }
-          } else {
-            snackbar('Wait for admin to end the night!');
-          }
-        });
-      }
-    }
-
     return Scaffold(
       floatingActionButton:
           floatingAction(onpressed: endDay, label: 'End the Day'),
