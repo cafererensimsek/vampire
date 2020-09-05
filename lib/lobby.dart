@@ -26,7 +26,7 @@ class _LobbyState extends State<Lobby> {
     return Firestore.instance.collection(sessionID).snapshots();
   }
 
-  Widget playerListDisplay(context, CollectionReference database) {
+  Widget playerListDisplay(BuildContext context, CollectionReference database) {
     final currentPlayers = Provider.of<QuerySnapshot>(context);
     Map<String, String> players = {};
 

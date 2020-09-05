@@ -1,13 +1,10 @@
 // the functions that are called when the day ends
 import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:vampir/classes/player.dart';
 import 'package:vampir/classes/widgets.dart';
-
-import '../home.dart';
 
 String findKey(Map<String, dynamic> map, int givenValue) {
   String keyToFind;
@@ -109,12 +106,12 @@ void endDay(Player player, String sessionID, String villagerKill,
     setSettings(sessionID);
     if (player.name == villagerKill) {
       setNewAdmin(sessionID, villagerKill);
-      Navigator.push(
+/*       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => Home(player: player),
         ),
-      );
+      ); */
     } else {
       Navigator.pushNamedAndRemoveUntil(context, '/night', (route) => false,
           arguments: {'sessionID': sessionID, 'player': player});

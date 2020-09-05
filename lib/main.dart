@@ -1,9 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'classes/player.dart';
 import 'game/day.dart';
 import 'game/night.dart';
-import 'home.dart';
 import 'classes/widgets.dart';
+import 'home.dart';
 
 void main() => runApp(Vampire());
 
@@ -17,7 +17,6 @@ class Vampire extends StatelessWidget {
         accentColor: Colors.white,
         primaryColor: Colors.deepPurple,
         floatingActionButtonTheme: FloatingActionButtonThemeData(
-          shape: RoundedRectangleBorder(),
           backgroundColor: Colors.white,
         ),
       ),
@@ -36,34 +35,64 @@ class Authentication extends StatefulWidget {
 }
 
 class _AuthenticationState extends State<Authentication> {
-  final userNameController = TextEditingController();
-  String _userName;
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  String _email;
+  String _password;
 
   @override
   void initState() {
     super.initState();
-    userNameController.addListener(_changeUserName);
+    emailController.addListener(_changeEmail);
+    passwordController.addListener(_changePassword);
   }
 
   @override
   void dispose() {
-    userNameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
-  _changeUserName() {
-    _userName = userNameController.text;
+  _changeEmail() {
+    _email = emailController.text;
   }
 
-  void createPlayer(BuildContext context) {
-    Player player = new Player(name: _userName);
-    _userName == null
-        ? Scaffold.of(context)
-            .showSnackBar(snackbar('Username must not be null!'))
-        : Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (BuildContext context) => Home(player: player)));
+  _changePassword() {
+    _password = passwordController.text;
+  }
+
+  void auth(BuildContext context) async {
+    try {
+      FirebaseUser user = (await FirebaseAuth.instance
+              .signInWithEmailAndPassword(email: _email, password: _password))
+          .user;
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => Home(user: user)));
+    } catch (e) {
+      switch (e.code) {
+        case "ERROR_USER_NOT_FOUND":
+          if (_password.length > 5) {
+            try {
+              FirebaseUser user = (await FirebaseAuth.instance
+                      .createUserWithEmailAndPassword(
+                          email: _email, password: _password))
+                  .user;
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => Home(user: user)));
+            } catch (e) {
+              Scaffold.of(context).showSnackBar(snackbar(e.message));
+            }
+          } else {
+            Scaffold.of(context).showSnackBar(
+                snackbar('Password must be at least 6 characters long!'));
+          }
+          break;
+        default:
+          Scaffold.of(context).showSnackBar(snackbar(e.message));
+          break;
+      }
+    }
   }
 
   @override
@@ -73,22 +102,27 @@ class _AuthenticationState extends State<Authentication> {
       body: SingleChildScrollView(
         child: Builder(builder: (BuildContext context) {
           return Column(children: [
+            SizedBox(height: 250),
+            Text('Login or Sign Up',
+                style: TextStyle(color: Colors.white, fontSize: 25)),
             SizedBox(height: 50),
             textInput(
-              controller: userNameController,
-              hintText: 'User Name',
-            ),
-            Builder(
-              builder: (BuildContext context) {
-                return FlatButton(
-                  color: Colors.transparent,
-                  child: Text(
-                    'Go Home',
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                  onPressed: () => createPlayer(context),
-                );
-              },
+                controller: emailController,
+                hintText: 'Email',
+                //icon: Icon(Icons.email, color: Colors.white),
+                keyboardType: TextInputType.emailAddress),
+            textInput(
+                controller: passwordController,
+                hintText: 'Password',
+                //icon: Icon(Icons.vpn_key, color: Colors.white),
+                obscure: true),
+            FlatButton(
+              color: Colors.transparent,
+              child: Text(
+                'Sign In/Sign Up',
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () => auth(context),
             ),
           ]);
         }),

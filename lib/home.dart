@@ -1,27 +1,31 @@
 import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:vampir/classes/lobby_functions.dart';
-import 'package:vampir/classes/widgets.dart';
-import 'package:vampir/lobby.dart';
-import 'classes/player.dart';
+import 'package:vampir/classes/player.dart';
+import 'classes/lobby_functions.dart';
+import 'classes/widgets.dart';
+import 'home_user.dart';
+import 'lobby.dart';
 
 class Home extends StatefulWidget {
-  final Player player;
-  const Home({Key key, this.player}) : super(key: key);
+  final FirebaseUser user;
 
+  const Home({Key key, this.user}) : super(key: key);
   @override
-  _HomeState createState() => _HomeState(player);
+  _HomeState createState() => _HomeState(user);
 }
 
 class _HomeState extends State<Home> {
-  final Player player;
+  final FirebaseUser user;
   final sessionIDController = TextEditingController();
   String sessionID;
-  var numberOfVampires;
+  int numberOfVampires;
+  Player player;
+  bool check = false;
+  int _index = 0;
 
-  _HomeState(this.player);
+  _HomeState(this.user);
 
   @override
   void initState() {
@@ -36,9 +40,7 @@ class _HomeState extends State<Home> {
   }
 
   _changeSessionID() {
-    setState(() {
-      sessionID = sessionIDController.text;
-    });
+    sessionID = sessionIDController.text;
   }
 
   Future<bool> doesExist(String sessionID) async {
@@ -53,7 +55,7 @@ class _HomeState extends State<Home> {
   Widget joinGameButton(BuildContext context, String sessionID) {
     return FlatButton(
       child: Text(
-        'Join the Game',
+        'Join Game',
         style: TextStyle(color: Colors.white, fontSize: 20),
       ),
       onPressed: () async {
@@ -146,7 +148,7 @@ class _HomeState extends State<Home> {
   }
 
   void createTheGame(BuildContext context) {
-    var newSessionID = Random().nextInt(1000000).toString();
+    String newSessionID = Random().nextInt(1000000).toString();
     showModalBottomSheet(
       elevation: 10,
       context: context,
@@ -180,37 +182,54 @@ class _HomeState extends State<Home> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Builder(
         builder: (BuildContext context) {
-          return floatingAction(
-            icon: Icons.add,
-            label: 'Create New Game',
-            onpressed: () => createTheGame(context),
+          return FloatingActionButton(
+            child: Icon(Icons.add),
+            onPressed: () => createTheGame(context),
           );
         },
       ),
-      body: Builder(
-        builder: (BuildContext context) {
-          return SingleChildScrollView(
-            physics: NeverScrollableScrollPhysics(),
-            child: Column(
-              children: [
-                SizedBox(height: 200),
-                Text(
-                  'Welcome, ${player.name}',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white, fontSize: 30),
-                ),
-                SizedBox(height: 75),
-                textInput(
-                  controller: sessionIDController,
-                  hintText: 'Session ID',
-                  //icon: Icon(Icons.confirmation_number, color: Colors.white),
-                  keyboardType: TextInputType.number,
-                ),
-                joinGameButton(context, sessionID),
-              ],
+      body: _index == 1
+          ? Builder(
+              builder: (BuildContext context) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Welcome',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 25,
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                    textInput(
+                      controller: sessionIDController,
+                      hintText: 'Session ID',
+                      keyboardType: TextInputType.number,
+                    ),
+                    joinGameButton(context, sessionID),
+                  ],
+                );
+              },
+            )
+          : HomeUser(user: user),
+      bottomNavigationBar: BottomAppBar(
+        shape: CircularNotchedRectangle(),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: Icon(Icons.person),
+              onPressed: () => setState(() => _index = 0),
             ),
-          );
-        },
+            IconButton(
+              icon: Icon(Icons.play_arrow),
+              onPressed: () => setState(() => _index = 1),
+            ),
+          ],
+        ),
       ),
     );
   }
