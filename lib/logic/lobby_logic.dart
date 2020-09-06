@@ -1,30 +1,9 @@
-// the functions that handle game creation and join
 import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:vampir/classes/player.dart';
 import 'package:vampir/classes/widgets.dart';
-
-Future createGame(Player admin, String sessionID) async {
-  admin.isAdmin = true;
-  await Firestore.instance.collection(sessionID).document(admin.name).setData({
-    'name': admin.name,
-    'isAdmin': admin.isAdmin,
-    'role': admin.role,
-  });
-}
-
-Future addPlayer(Player player, String sessionID) async {
-  return await Firestore.instance
-      .collection(sessionID)
-      .document(player.name)
-      .setData({
-    'name': player.name,
-    'isAdmin': player.isAdmin,
-    'role': player.role,
-  });
-}
 
 void startGame(CollectionReference database, Player player,
     BuildContext context, String sessionID) {
@@ -50,14 +29,16 @@ void startGame(CollectionReference database, Player player,
 }
 
 void resetRoles(CollectionReference database, String sessionID, Player player) {
-  database.getDocuments().then((snapshot) {
-    for (int i = 1; i < snapshot.documents.length; i++) {
-      database
-          .document(snapshot.documents[i].documentID)
-          .updateData({'role': 'villager'});
-      player.role = 'villager';
-    }
-  });
+  if (player.isAdmin) {
+    database.getDocuments().then((snapshot) {
+      for (int i = 1; i < snapshot.documents.length; i++) {
+        database
+            .document(snapshot.documents[i].documentID)
+            .updateData({'role': 'villager'});
+        player.role = 'villager';
+      }
+    });
+  }
 }
 
 void assignRoles(CollectionReference database, Player player) {
@@ -74,4 +55,31 @@ void assignRoles(CollectionReference database, Player player) {
       }
     },
   );
+}
+
+Map getCurrentPlayers(BuildContext context) {
+  final currentPlayers = Provider.of<QuerySnapshot>(context);
+  Map<String, String> players = {};
+
+  currentPlayers.documents.forEach((element) {
+    if (element.documentID != 'Game Settings') {
+      String privilege = element.data['isAdmin'] ? 'Admin' : 'Player';
+      players[element.documentID] = privilege;
+    }
+  });
+
+  return players;
+}
+
+void deletePlayer(
+  CollectionReference database,
+  String playerID,
+  Player player,
+) {
+  if (player.isAdmin) {
+    database.document(playerID).delete();
+    Firestore.instance.collection('players').document(player.email).setData({
+      'inSession': false,
+    }, merge: true);
+  }
 }

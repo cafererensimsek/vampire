@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vampir/classes/day_functions.dart';
 import 'package:vampir/classes/widgets.dart';
-import '../classes/player.dart';
+import 'classes/player.dart';
 
 class Day extends StatefulWidget {
   @override

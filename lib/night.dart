@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:vampir/classes/night_functions.dart';
-import '../classes/player.dart';
-import '../classes/widgets.dart';
+import 'classes/player.dart';
+import 'classes/widgets.dart';
 
 class Night extends StatefulWidget {
   @override

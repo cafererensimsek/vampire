@@ -1,0 +1,134 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:vampir/classes/player.dart';
+import 'package:vampir/classes/widgets.dart';
+import '../lobby.dart';
+
+Future createGame(
+  Player admin,
+  String sessionID,
+  int vampireCount,
+  BuildContext context,
+  Player player,
+  int numberOfVampires,
+) async {
+  if (numberOfVampires != null && admin.email != null) {
+    await Firestore.instance
+        .collection('players')
+        .document(admin.email)
+        .setData({
+      'inSession': true,
+      'isAdmin': true,
+    }, merge: true);
+
+    await updatePlayerOnce(player, admin.email);
+
+    await Firestore.instance
+        .collection(sessionID)
+        .document(admin.name)
+        .setData({
+      'name': admin.name,
+      'isAdmin': admin.isAdmin,
+      'role': admin.role,
+    });
+
+    Firestore.instance.collection(sessionID).document('Game Settings').setData({
+      'vampireCount': vampireCount,
+      'isInLobby': true,
+    });
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => Lobby(
+          player: player,
+          sessionID: sessionID,
+        ),
+      ),
+    );
+  } else {
+    Navigator.pop(context);
+    Scaffold.of(context)
+        .showSnackBar(snackbar('Invalid vampire count or username!'));
+  }
+}
+
+Future<bool> doesExist(String sessionID) async {
+  try {
+    Firestore.instance.collection(sessionID).getDocuments();
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+Future addPlayer(
+    Player player, String sessionID, BuildContext context, String email) async {
+  bool check = await doesExist(sessionID);
+  if (check && player.email != null) {
+    Firestore.instance.collection('players').document(email).setData({
+      'inSession': true,
+      'isAdmin': false,
+    }, merge: true);
+    await updatePlayerOnce(player, email);
+    await Firestore.instance
+        .collection(sessionID)
+        .document(player.name)
+        .setData({
+      'name': player.name,
+      'isAdmin': player.isAdmin,
+      'role': player.role,
+    });
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Lobby(
+          player: player,
+          sessionID: sessionID,
+        ),
+      ),
+    );
+  } else {
+    Scaffold.of(context)
+        .showSnackBar(snackbar('Invalid Session ID or Username!'));
+  }
+}
+
+void updatePlayerStream(Player player, BuildContext context) {
+  final currentData = Provider.of<DocumentSnapshot>(context, listen: false);
+  if (currentData != null && currentData.data != null) {
+    player.email = currentData.data['email'];
+    player.name = currentData.data['userName'];
+    player.role = currentData.data['role'];
+    player.session = currentData.data['session'];
+    player.isAdmin = currentData.data['isAdmin'];
+    player.inSession = currentData.data['inSession'];
+  }
+}
+
+Future<void> updatePlayerOnce(Player player, String email) async {
+  Firestore.instance.collection('players').document(email).get().then((value) {
+    player.email = value.data['email'];
+    player.name = value.data['userName'];
+    player.role = value.data['role'];
+    player.session = value.data['session'];
+    player.isAdmin = value.data['isAdmin'];
+    player.inSession = value.data['inSession'];
+  });
+}
+
+void changeName(String userName, String email, BuildContext context) {
+  if (userName == null) {
+    Scaffold.of(context).showSnackBar(snackbar('Username must not be null!'));
+    return;
+  }
+  Firestore.instance.collection('players').document(email).setData({
+    'email': email,
+    'userName': userName,
+    'role': 'villager',
+    'session': "",
+    'isAdmin': false,
+    'inSession': false,
+  }, merge: true);
+}

@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'game/day.dart';
-import 'game/night.dart';
+import 'package:vampir/lobby.dart';
+import 'day.dart';
+import 'night.dart';
 import 'classes/widgets.dart';
 import 'home.dart';
 
@@ -67,8 +68,8 @@ class _AuthenticationState extends State<Authentication> {
       FirebaseUser user = (await FirebaseAuth.instance
               .signInWithEmailAndPassword(email: _email, password: _password))
           .user;
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => Home(user: user)));
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => Home(email: user.email)));
     } catch (e) {
       switch (e.code) {
         case "ERROR_USER_NOT_FOUND":
@@ -78,8 +79,10 @@ class _AuthenticationState extends State<Authentication> {
                       .createUserWithEmailAndPassword(
                           email: _email, password: _password))
                   .user;
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => Home(user: user)));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => Home(email: user.email)));
             } catch (e) {
               Scaffold.of(context).showSnackBar(snackbar(e.message));
             }
