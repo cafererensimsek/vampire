@@ -39,7 +39,9 @@ class _HomeState extends State<Home> {
   }
 
   _changeSessionID() {
-    sessionID = sessionIDController.text;
+    setState(() {
+      sessionID = sessionIDController.text;
+    });
   }
 
   _changeUserName() {

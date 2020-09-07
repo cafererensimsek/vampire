@@ -56,11 +56,15 @@ Future createGame(
 }
 
 Future<bool> doesExist(String sessionID) async {
+  var data;
   try {
-    Firestore.instance.collection(sessionID).getDocuments();
-    return true;
+    Firestore.instance
+        .collection(sessionID)
+        .document('Game Settings')
+        .get()
+        .then((value) => data = value.data);
+    return data != null ? true : false;
   } catch (e) {
-    print(e);
     return false;
   }
 }
