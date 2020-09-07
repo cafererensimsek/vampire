@@ -1,10 +1,9 @@
-// the functions that are called when the day ends
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:vampir/day.dart';
 import 'package:vampir/shared/player.dart';
-import 'package:vampir/shared/widgets.dart';
 
 String findKey(Map<String, dynamic> map, int givenValue) {
   String keyToFind;
@@ -16,29 +15,13 @@ String findKey(Map<String, dynamic> map, int givenValue) {
   return keyToFind;
 }
 
-void setSettings(sessionID) {
-  Firestore.instance
-      .collection(sessionID)
-      .document('Game Settings')
-      .updateData({
-    'didDayEnd': true,
-    'didNightEnd': false,
-  });
-  Firestore.instance
-      .collection(sessionID)
-      .document('Game Settings')
-      .collection('Day Values')
-      .document('Villager Kill')
-      .delete();
-}
-
-Future<String> findVillagerChoice(sessionID) async {
+Future<String> findvillagerChoice(sessionID) async {
   String villagerChoice;
   await Firestore.instance
       .collection(sessionID)
       .document('Game Settings')
-      .collection('Day Values')
-      .document('Villager Votes')
+      .collection('Night Values')
+      .document('villager Votes')
       .get()
       .then((value) {
     List votes = value.data.values.toList();
@@ -58,17 +41,32 @@ void killVillagerChoice(sessionID, villagerChoice) {
   Firestore.instance
       .collection(sessionID)
       .document('Game Settings')
-      .collection('Day Values')
-      .document('Villager Kill')
+      .collection('Night Values')
+      .document('villager Kill')
       .setData({
-    'vampireKill': villagerChoice,
+    'villagerKill': villagerChoice,
   });
   Firestore.instance
       .collection(sessionID)
       .document('Game Settings')
-      .collection('Day Values')
-      .document('Villager Votes')
+      .collection('Night Values')
+      .document('villager Votes')
       .delete();
+  Firestore.instance
+      .collection('players')
+      .document(villagerChoice)
+      .setData({'inSession': false}, merge: true);
+}
+
+void setSettings(sessionID) {
+  Firestore.instance
+      .collection(sessionID)
+      .document('Game Settings')
+      .updateData({
+    'didNightEnd': true,
+    'didDayEnd': false,
+    'isInLobby': false,
+  });
 }
 
 Future<void> setNewAdmin(sessionID, villagerKill) async {
@@ -86,54 +84,76 @@ Future<void> setNewAdmin(sessionID, villagerKill) async {
         .collection(sessionID)
         .document(randomDocID)
         .updateData({'isAdmin': true});
-  });
-}
-
-Future<void> setPlayerAdmin(sessionID, player) async {
-  await Firestore.instance.collection(sessionID).getDocuments().then((value) {
-    value.documents.forEach((element) {
-      if (element.data['isAdmin'] == true &&
-          element.documentID == player.name) {
-        player.isAdmin = true;
-      }
-    });
-  });
-}
-
-void endDay(Player player, String sessionID, String villagerKill,
-    BuildContext context) {
-  if (player.isAdmin) {
-    setSettings(sessionID);
-    if (player.name == villagerKill) {
-      setNewAdmin(sessionID, villagerKill);
-/*       Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => Home(player: player),
-        ),
-      ); */
-    } else {
-      Navigator.pushNamedAndRemoveUntil(context, '/night', (route) => false,
-          arguments: {'sessionID': sessionID, 'player': player});
-    }
-  } else {
     Firestore.instance
-        .collection(sessionID)
+        .collection('players')
+        .document(randomDocID)
+        .updateData({'isAdmin': true});
+  });
+}
+
+void endDay(
+  Player player,
+  String sessionID,
+  BuildContext context,
+  CollectionReference database,
+) async {
+  var villagerChoice = await findvillagerChoice(sessionID);
+  killVillagerChoice(sessionID, villagerChoice);
+
+  setSettings(sessionID);
+  await setNewAdmin(sessionID, villagerChoice);
+
+  Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) =>
+            Day(player: player, sessionID: sessionID),
+      ),
+      (route) => false);
+}
+
+void villagerVote(
+  Player player,
+  bool didVote,
+  String playerID,
+  CollectionReference database,
+  String votedFor,
+) {
+  if (player.role == 'villager' && !didVote && playerID != player.name) {
+    database
         .document('Game Settings')
-        .get()
-        .then((value) {
-      if (value.data['didDayEnd'] == true) {
-        if (player.name != villagerKill) {
-          setPlayerAdmin(sessionID, player);
-          Navigator.pushNamedAndRemoveUntil(context, '/night', (route) => false,
-              arguments: {'sessionID': sessionID, 'player': player});
-        } else {
-          Navigator.pushNamedAndRemoveUntil(context, '/night', (route) => false,
-              arguments: {'sessionID': sessionID, 'player': player});
-        }
-      } else {
-        snackbar('Wait for admin to end the night!');
-      }
-    });
+        .collection('Night Values')
+        .document('villager Votes')
+        .setData({
+      playerID: FieldValue.increment(1),
+    }, merge: true);
+    didVote = true;
+    votedFor = playerID;
+  } else if (player.role == 'villager' &&
+      didVote &&
+      votedFor != playerID &&
+      playerID != player.name) {
+    database
+        .document('Game Settings')
+        .collection('Night Values')
+        .document('villager Votes')
+        .setData({
+      votedFor: FieldValue.increment(-1),
+      playerID: FieldValue.increment(1),
+    }, merge: true);
+    votedFor = playerID;
   }
+}
+
+Future<Map<String, String>> getPlayers(String sessionID) async {
+  Map<String, String> players = {};
+  QuerySnapshot docs =
+      await Firestore.instance.collection(sessionID).getDocuments();
+  docs.documents.forEach((element) {
+    if (element.documentID != 'Game Settings') {
+      String privilege = element.data['isAdmin'] ? 'Admin' : 'Player';
+      players[element.documentID] = privilege;
+    }
+  });
+  return players;
 }

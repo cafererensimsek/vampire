@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:vampir/shared/widgets.dart';
+import 'package:provider/provider.dart';
 import 'package:vampir/logic/day_logic.dart';
 import 'shared/player.dart';
+import 'shared/widgets.dart';
+import 'widgets/day_widget.dart';
 
 class Day extends StatefulWidget {
   final Player player;
@@ -17,19 +20,38 @@ class _DayState extends State<Day> {
   final String sessionID;
 
   _DayState(this.player, this.sessionID);
+
+  Stream<DocumentSnapshot> get playerData {
+    return Firestore.instance
+        .collection('players')
+        .document(player.email)
+        .snapshots();
+  }
+
   @override
   Widget build(BuildContext context) {
-    String villagerKill;
-    String vampireKill;
+    CollectionReference database = Firestore.instance.collection(sessionID);
 
-    return Scaffold(
-      floatingActionButton:
-          floatingAction(onpressed: endDay, label: 'End the Day'),
-      body: Column(
-        children: [
-          Text('Villagers killed: $villagerKill'),
-          Text('Villagers killed: $vampireKill'),
-        ],
+    return StreamProvider.value(
+      value: playerData,
+      child: FutureBuilder(
+        future: getPlayers(sessionID),
+        builder: (
+          BuildContext context,
+          AsyncSnapshot<Map<String, String>> snapshot,
+        ) {
+          return snapshot.hasData
+              ? day(
+                  context,
+                  database,
+                  snapshot.data,
+                  false,
+                  "",
+                  sessionID,
+                  player,
+                )
+              : loading(context);
+        },
       ),
     );
   }

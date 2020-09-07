@@ -7,7 +7,7 @@ import 'package:vampir/shared/widgets.dart';
 import 'package:vampir/home.dart';
 import 'package:vampir/logic/night_logic.dart';
 
-dynamic night(
+dynamic day(
   context,
   CollectionReference database,
   Map<String, String> players,
@@ -20,16 +20,16 @@ dynamic night(
 
   bool inSession = false;
   bool isAdmin = false;
-  bool atNight = false;
+  bool atDay = false;
   if (currentData != null) {
     inSession = currentData.data['inSession'];
     isAdmin = currentData.data['isAdmin'];
-    atNight = currentData.data['atNight'];
+    atDay = currentData.data['atDay'];
   }
 
-  if (inSession && isAdmin && atNight) {
+  if (inSession && isAdmin && atDay) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       appBar: AppBar(title: Text(player.role)),
       floatingActionButton: Builder(
         builder: (BuildContext context) {
@@ -64,9 +64,9 @@ dynamic night(
         ],
       ),
     );
-  } else if (inSession && !isAdmin && atNight) {
+  } else if (inSession && !isAdmin && atDay) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       appBar: AppBar(title: Text(player.role)),
       body: ListView(
         children: [
@@ -92,7 +92,7 @@ dynamic night(
         ],
       ),
     );
-  } else if (inSession && !atNight) {
+  } else if (inSession && !atDay) {
     Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
@@ -102,7 +102,7 @@ dynamic night(
         (route) => false);
   } else if (!inSession) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
