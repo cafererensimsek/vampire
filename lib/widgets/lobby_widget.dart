@@ -47,7 +47,7 @@ dynamic playerListDisplay(BuildContext context, CollectionReference database,
   DocumentSnapshot currentData = Provider.of<DocumentSnapshot>(context);
 
   bool inSession = false;
-  currentData != null ? currentData.data['inSession'] = true : null;
+  currentData != null ? inSession = currentData.data['inSession'] : null;
 
   if (inSession) {
     return Scaffold(
@@ -74,8 +74,31 @@ dynamic playerListDisplay(BuildContext context, CollectionReference database,
       body: playerList(context, player, database, getCurrentPlayers(context)),
     );
   } else {
-    print('this ran');
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (BuildContext context) => Home(email: player.email)));
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'You\'ve been kicked out! \n\nYou will be redirected to the home page.',
+            style: TextStyle(color: Colors.white, fontSize: 30),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 75),
+          FlatButton(
+            color: Colors.transparent,
+            onPressed: () => Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (BuildContext context) => Home(email: player.email),
+                ),
+                (route) => false),
+            child: Text(
+              'OK',
+              style: TextStyle(color: Colors.white, fontSize: 25),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
