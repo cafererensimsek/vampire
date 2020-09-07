@@ -6,7 +6,9 @@ class Player {
   String role;
   bool isAdmin;
   bool inSession;
-  String session;
+  bool inLobby;
+  bool atNight;
+  bool atDay;
   String email;
 
   Player({
@@ -15,6 +17,8 @@ class Player {
     this.isAdmin = false,
     this.role = 'villager',
     this.inSession = false,
-    this.session = "",
+    this.inLobby = false,
+    this.atDay = false,
+    this.atNight = false,
   });
 }

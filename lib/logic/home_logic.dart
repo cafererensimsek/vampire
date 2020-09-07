@@ -20,16 +20,17 @@ Future createGame(
         .setData({
       'inSession': true,
       'isAdmin': true,
+      'inLobby': true,
     }, merge: true);
 
     await updatePlayerOnce(player, admin.email);
 
     await Firestore.instance
         .collection(sessionID)
-        .document(admin.name)
+        .document(admin.email)
         .setData({
       'name': admin.name,
-      'isAdmin': admin.isAdmin,
+      'isAdmin': true,
       'role': admin.role,
     });
 
@@ -59,6 +60,7 @@ Future<bool> doesExist(String sessionID) async {
     Firestore.instance.collection(sessionID).getDocuments();
     return true;
   } catch (e) {
+    print(e);
     return false;
   }
 }
@@ -70,11 +72,12 @@ Future addPlayer(
     Firestore.instance.collection('players').document(email).setData({
       'inSession': true,
       'isAdmin': false,
+      'inLobby': true,
     }, merge: true);
     await updatePlayerOnce(player, email);
     await Firestore.instance
         .collection(sessionID)
-        .document(player.name)
+        .document(player.email)
         .setData({
       'name': player.name,
       'isAdmin': player.isAdmin,
@@ -101,7 +104,9 @@ void updatePlayerStream(Player player, BuildContext context) {
     player.email = currentData.data['email'];
     player.name = currentData.data['userName'];
     player.role = currentData.data['role'];
-    player.session = currentData.data['session'];
+    player.inLobby = currentData.data['inLobby'];
+    player.atNight = currentData.data['atNight'];
+    player.atDay = currentData.data['atDay'];
     player.isAdmin = currentData.data['isAdmin'];
     player.inSession = currentData.data['inSession'];
   }
@@ -112,7 +117,9 @@ Future<void> updatePlayerOnce(Player player, String email) async {
     player.email = value.data['email'];
     player.name = value.data['userName'];
     player.role = value.data['role'];
-    player.session = value.data['session'];
+    player.inLobby = value.data['inLobby'];
+    player.atNight = value.data['atNight'];
+    player.atDay = value.data['atDay'];
     player.isAdmin = value.data['isAdmin'];
     player.inSession = value.data['inSession'];
   });
@@ -127,7 +134,9 @@ void changeName(String userName, String email, BuildContext context) {
     'email': email,
     'userName': userName,
     'role': 'villager',
-    'session': "",
+    'inLobby': false,
+    'atNight': false,
+    'atDay': false,
     'isAdmin': false,
     'inSession': false,
   }, merge: true);

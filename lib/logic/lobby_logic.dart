@@ -3,29 +3,32 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vampir/classes/player.dart';
-import 'package:vampir/classes/widgets.dart';
 
-void startGame(CollectionReference database, Player player,
-    BuildContext context, String sessionID) {
-  if (player.isAdmin) {
-    database.document('Game Settings').updateData({
-      'isInLobby': false,
+void startGame(
+  CollectionReference database,
+  Player player,
+  BuildContext context,
+  String sessionID,
+) {
+  database.document('Game Settings').updateData({
+    'isInLobby': false,
+  });
+  Navigator.pushNamedAndRemoveUntil(context, '/night', (route) => false,
+      arguments: {'sessionID': sessionID, 'player': player});
+  database.getDocuments().then((snapshot) {
+    snapshot.documents.forEach((document) {
+      print(document.documentID);
+      if (document.documentID != 'Game Settings') {
+        Firestore.instance
+            .collection('players')
+            .document(document.documentID)
+            .setData({
+          'inLobby': false,
+          'atNight': true,
+        }, merge: true);
+      }
     });
-    Navigator.pushNamedAndRemoveUntil(context, '/night', (route) => false,
-        arguments: {'sessionID': sessionID, 'player': player});
-  } else {
-    database.document('Game Settings').get().then(
-      (value) {
-        if (value.data.containsValue(false)) {
-          Navigator.pushNamedAndRemoveUntil(context, '/night', (route) => false,
-              arguments: {'sessionID': sessionID, 'player': player});
-        } else {
-          return Scaffold.of(context)
-              .showSnackBar(snackbar('Wait for the admin to start the game!'));
-        }
-      },
-    );
-  }
+  });
 }
 
 void resetRoles(CollectionReference database, String sessionID, Player player) {
@@ -59,12 +62,12 @@ void assignRoles(CollectionReference database, Player player) {
 
 Map getCurrentPlayers(BuildContext context) {
   final currentPlayers = Provider.of<QuerySnapshot>(context);
-  Map<String, String> players = {};
+  Map<String, List<String>> players = {};
 
   currentPlayers.documents.forEach((element) {
     if (element.documentID != 'Game Settings') {
       String privilege = element.data['isAdmin'] ? 'Admin' : 'Player';
-      players[element.documentID] = privilege;
+      players[element.documentID] = [privilege, element.data['name']];
     }
   });
 
@@ -78,7 +81,7 @@ void deletePlayer(
 ) {
   if (player.isAdmin) {
     database.document(playerID).delete();
-    Firestore.instance.collection('players').document(player.email).setData({
+    Firestore.instance.collection('players').document(playerID).setData({
       'inSession': false,
     }, merge: true);
   }

@@ -6,50 +6,27 @@ import 'package:vampir/classes/widgets.dart';
 import 'package:vampir/home.dart';
 import 'package:vampir/logic/lobby_logic.dart';
 
-Widget playerList(
+dynamic playerListDisplay(
   BuildContext context,
-  Player player,
   CollectionReference database,
-  Map<String, String> players,
+  Player player,
+  String sessionID,
 ) {
-  return ListView(
-    children: [
-      for (String playerID in players.keys)
-        Card(
-          color: Theme.of(context).primaryColor,
-          child: ListTile(
-            title: Padding(
-              padding: const EdgeInsets.only(left: 20),
-              child: Text(playerID, style: TextStyle(color: Colors.white)),
-            ),
-            subtitle: Padding(
-              padding: const EdgeInsets.only(left: 20),
-              child: Text(players[playerID],
-                  style: TextStyle(color: Colors.white)),
-            ),
-            onTap: () => deletePlayer(database, playerID, player),
-            leading: Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Icon(Icons.person, color: Colors.white),
-            ),
-            trailing: Padding(
-              padding: const EdgeInsets.only(right: 10),
-              child: Icon(Icons.delete, color: Colors.white),
-            ),
-          ),
-        ),
-    ],
-  );
-}
-
-dynamic playerListDisplay(BuildContext context, CollectionReference database,
-    Player player, String sessionID) {
   DocumentSnapshot currentData = Provider.of<DocumentSnapshot>(context);
+  Map players = getCurrentPlayers(context);
 
   bool inSession = false;
-  currentData != null ? inSession = currentData.data['inSession'] : null;
+  bool isAdmin = false;
+  bool inLobby = true;
+  bool atNight = false;
+  if (currentData != null) {
+    inSession = currentData.data['inSession'];
+    isAdmin = currentData.data['isAdmin'];
+    inLobby = currentData.data['inLobby'];
+    atNight = currentData.data['atNight'];
+  }
 
-  if (inSession) {
+  if (inSession && isAdmin) {
     return Scaffold(
       backgroundColor: Colors.black,
       floatingActionButton: floatingAction(
@@ -71,9 +48,76 @@ dynamic playerListDisplay(BuildContext context, CollectionReference database,
           ),
         ],
       ),
-      body: playerList(context, player, database, getCurrentPlayers(context)),
+      body: ListView(
+        children: [
+          for (String playerID in players.keys)
+            Card(
+              color: Theme.of(context).primaryColor,
+              child: ListTile(
+                title: Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: Text(players[playerID][1],
+                      style: TextStyle(color: Colors.white)),
+                ),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: Text(players[playerID][0],
+                      style: TextStyle(color: Colors.white)),
+                ),
+                onTap: () => deletePlayer(database, playerID, player),
+                leading: Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Icon(Icons.person, color: Colors.white),
+                ),
+                trailing: Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: Icon(Icons.delete, color: Colors.white),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
-  } else {
+  } else if (inSession && !isAdmin && inLobby) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: Text("Session ID:$sessionID"),
+        centerTitle: true,
+      ),
+      body: ListView(
+        children: [
+          for (String playerID in players.keys)
+            Card(
+              color: Theme.of(context).primaryColor,
+              child: ListTile(
+                title: Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: Text(players[playerID][1],
+                      style: TextStyle(color: Colors.white)),
+                ),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: Text(players[playerID][0],
+                      style: TextStyle(color: Colors.white)),
+                ),
+                onLongPress: () => deletePlayer(database, playerID, player),
+                leading: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
+                  child: Icon(Icons.person, color: Colors.white),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  } else if (inSession && !isAdmin && atNight) {
+    print(inSession);
+    print(isAdmin);
+    print(atNight);
+    Navigator.of(context).pushNamedAndRemoveUntil('/night', (route) => false,
+        arguments: {'sessionID': sessionID, 'player': player});
+  } else if (!inSession) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Column(

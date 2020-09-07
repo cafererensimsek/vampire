@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:vampir/classes/player.dart';
 import 'package:vampir/widgets/home_widget.dart';
@@ -58,7 +57,9 @@ class _HomeState extends State<Home> {
     List<dynamic> bodyWidgets = [
       userName(
           context, playerData, player, userNameController, _userName, email),
-      sessionScreen(context, sessionIDController, player, sessionID),
+      Builder(
+          builder: (BuildContext context) =>
+              sessionScreen(context, sessionIDController, player, sessionID)),
     ];
 
     return Scaffold(
