@@ -1,9 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:vampir/lobby.dart';
-import 'day.dart';
-import 'night.dart';
-import 'classes/widgets.dart';
+import 'shared/widgets.dart';
 import 'home.dart';
 
 void main() => runApp(Vampire());
@@ -21,10 +18,6 @@ class Vampire extends StatelessWidget {
           backgroundColor: Colors.white,
         ),
       ),
-      routes: {
-        '/day': (BuildContext context) => Day(),
-        '/night': (BuildContext context) => Night(),
-      },
       home: Authentication(),
     );
   }

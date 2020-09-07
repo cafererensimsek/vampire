@@ -2,8 +2,8 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:vampir/classes/player.dart';
-import 'package:vampir/classes/widgets.dart';
+import 'package:vampir/shared/player.dart';
+import '../day.dart';
 
 String findKey(Map<String, dynamic> map, int givenValue) {
   String keyToFind;
@@ -52,6 +52,10 @@ void killVampireChoice(sessionID, vampireChoice) {
       .collection('Night Values')
       .document('Vampire Votes')
       .delete();
+  Firestore.instance
+      .collection('players')
+      .document(vampireChoice)
+      .setData({'inSession': false}, merge: true);
 }
 
 void setSettings(sessionID) {
@@ -80,44 +84,32 @@ Future<void> setNewAdmin(sessionID, vampireKill) async {
         .collection(sessionID)
         .document(randomDocID)
         .updateData({'isAdmin': true});
+    Firestore.instance
+        .collection('players')
+        .document(randomDocID)
+        .updateData({'isAdmin': true});
   });
 }
 
-Future<void> setPlayerAdmin(sessionID, player) async {
-  await Firestore.instance.collection(sessionID).getDocuments().then((value) {
-    value.documents.forEach((element) {
-      if (element.data['isAdmin'] == true &&
-          element.documentID == player.name) {
-        player.isAdmin = true;
-      }
-    });
-  });
-}
+void endNight(
+  Player player,
+  String sessionID,
+  BuildContext context,
+  CollectionReference database,
+) async {
+  var vampireChoice = await findVampireChoice(sessionID);
+  killVampireChoice(sessionID, vampireChoice);
 
-void endNight(Player player, String sessionID, BuildContext context,
-    CollectionReference database) async {
-  if (player.isAdmin) {
-    var vampireChoice = await findVampireChoice(sessionID);
-    killVampireChoice(sessionID, vampireChoice);
+  setSettings(sessionID);
+  await setNewAdmin(sessionID, vampireChoice);
 
-    setSettings(sessionID);
-    await setNewAdmin(sessionID, vampireChoice);
-
-    // a firebase function should run here updating each user's local data => setPlayerAdmin
-
-    Navigator.pushNamedAndRemoveUntil(context, '/day', (route) => false,
-        arguments: {'sessionID': sessionID, 'player': player});
-  } else {
-    database.document('Game Settings').get().then((value) {
-      if (value.data['didNightEnd'] == true) {
-        Navigator.pushNamedAndRemoveUntil(context, '/day', (route) => false,
-            arguments: {'sessionID': sessionID, 'player': player});
-      } else {
-        Scaffold.of(context)
-            .showSnackBar(snackbar('Wait for the admin to end the night!'));
-      }
-    });
-  }
+  Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) =>
+            Day(player: player, sessionID: sessionID),
+      ),
+      (route) => false);
 }
 
 void vampireVote(Player player, bool didVote, String playerID,

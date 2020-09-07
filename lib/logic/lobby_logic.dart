@@ -2,7 +2,9 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:vampir/classes/player.dart';
+import 'package:vampir/shared/player.dart';
+
+import '../night.dart';
 
 void startGame(
   CollectionReference database,
@@ -13,8 +15,13 @@ void startGame(
   database.document('Game Settings').updateData({
     'isInLobby': false,
   });
-  Navigator.pushNamedAndRemoveUntil(context, '/night', (route) => false,
-      arguments: {'sessionID': sessionID, 'player': player});
+  Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+          builder: (BuildContext context) =>
+              Night(player: player, sessionID: sessionID)),
+      (route) => false);
+
   database.getDocuments().then((snapshot) {
     snapshot.documents.forEach((document) {
       print(document.documentID);

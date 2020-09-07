@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vampir/widgets/lobby_widget.dart';
-import 'classes/player.dart';
+import 'shared/player.dart';
 
 class Lobby extends StatefulWidget {
   final Player player;
@@ -41,8 +41,13 @@ class _LobbyState extends State<Lobby> {
         StreamProvider<DocumentSnapshot>.value(value: playerData),
       ],
       child: Builder(
-          builder: (BuildContext context) =>
-              playerListDisplay(context, database, player, sessionID)),
+        builder: (BuildContext context) => playerListDisplay(
+          context,
+          database,
+          player,
+          sessionID,
+        ),
+      ),
     );
   }
 }

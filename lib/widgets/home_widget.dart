@@ -2,8 +2,8 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:vampir/classes/player.dart';
-import 'package:vampir/classes/widgets.dart';
+import 'package:vampir/shared/player.dart';
+import 'package:vampir/shared/widgets.dart';
 import 'package:vampir/logic/home_logic.dart';
 
 void createTheGame(BuildContext context, Player player, int numberOfVampires) {

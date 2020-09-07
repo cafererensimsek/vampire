@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:vampir/classes/player.dart';
-import 'package:vampir/classes/widgets.dart';
+import 'package:vampir/shared/player.dart';
+import 'package:vampir/shared/widgets.dart';
 import 'package:vampir/home.dart';
 import 'package:vampir/logic/lobby_logic.dart';
+
+import '../night.dart';
 
 dynamic playerListDisplay(
   BuildContext context,
@@ -24,6 +26,7 @@ dynamic playerListDisplay(
     isAdmin = currentData.data['isAdmin'];
     inLobby = currentData.data['inLobby'];
     atNight = currentData.data['atNight'];
+    player.role = currentData['role'];
   }
 
   if (inSession && isAdmin) {
@@ -112,11 +115,12 @@ dynamic playerListDisplay(
       ),
     );
   } else if (inSession && !isAdmin && atNight) {
-    print(inSession);
-    print(isAdmin);
-    print(atNight);
-    Navigator.of(context).pushNamedAndRemoveUntil('/night', (route) => false,
-        arguments: {'sessionID': sessionID, 'player': player});
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) =>
+                Night(player: player, sessionID: sessionID)),
+        (route) => false);
   } else if (!inSession) {
     return Scaffold(
       backgroundColor: Colors.black,

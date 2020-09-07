@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:vampir/classes/day_functions.dart';
-import 'package:vampir/classes/widgets.dart';
-import 'classes/player.dart';
+import 'package:vampir/shared/widgets.dart';
+import 'package:vampir/logic/day_logic.dart';
+import 'shared/player.dart';
 
 class Day extends StatefulWidget {
+  final Player player;
+  final String sessionID;
+
+  const Day({Key key, this.player, this.sessionID}) : super(key: key);
   @override
-  _DayState createState() => _DayState();
+  _DayState createState() => _DayState(player, sessionID);
 }
 
 class _DayState extends State<Day> {
+  final Player player;
+  final String sessionID;
+
+  _DayState(this.player, this.sessionID);
   @override
   Widget build(BuildContext context) {
-    final Map arguments = ModalRoute.of(context).settings.arguments as Map;
-    String sessionID = arguments['SessionID'];
-    Player player = arguments['player'];
     String villagerKill;
     String vampireKill;
 

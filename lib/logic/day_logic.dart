@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:vampir/classes/player.dart';
-import 'package:vampir/classes/widgets.dart';
+import 'package:vampir/shared/player.dart';
+import 'package:vampir/shared/widgets.dart';
 
 String findKey(Map<String, dynamic> map, int givenValue) {
   String keyToFind;
