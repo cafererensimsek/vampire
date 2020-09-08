@@ -38,7 +38,7 @@ class _NightState extends State<Night> {
         future: getPlayers(sessionID),
         builder: (
           BuildContext context,
-          AsyncSnapshot<Map<String, String>> snapshot,
+          AsyncSnapshot<Map<String, List<String>>> snapshot,
         ) {
           return snapshot.hasData
               ? night(

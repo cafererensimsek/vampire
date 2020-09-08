@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vampir/shared/player.dart';
-
 import '../night.dart';
 
 void startGame(
@@ -12,9 +11,6 @@ void startGame(
   BuildContext context,
   String sessionID,
 ) {
-  database.document('Game Settings').updateData({
-    'isInLobby': false,
-  });
   Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
@@ -24,7 +20,6 @@ void startGame(
 
   database.getDocuments().then((snapshot) {
     snapshot.documents.forEach((document) {
-      print(document.documentID);
       if (document.documentID != 'Game Settings') {
         Firestore.instance
             .collection('players')
@@ -45,7 +40,10 @@ void resetRoles(CollectionReference database, String sessionID, Player player) {
         database
             .document(snapshot.documents[i].documentID)
             .updateData({'role': 'villager'});
-        player.role = 'villager';
+        Firestore.instance
+            .collection('players')
+            .document(snapshot.documents[i].documentID)
+            .updateData({'role': 'villager'});
       }
     });
   }
@@ -59,8 +57,11 @@ void assignRoles(CollectionReference database, Player player) {
             .documents[(1 + Random().nextInt(snapshot.documents.length - 1))]
             .documentID;
         database.document(randomDocID).updateData({'role': 'vampire'});
-        if (player.name == randomDocID) {
-          player.role = 'vampire';
+        if (player.email == randomDocID) {
+          Firestore.instance
+              .collection('players')
+              .document(randomDocID)
+              .updateData({'role': 'vampire'});
         }
       }
     },
@@ -74,7 +75,11 @@ Map getCurrentPlayers(BuildContext context) {
   currentPlayers.documents.forEach((element) {
     if (element.documentID != 'Game Settings') {
       String privilege = element.data['isAdmin'] ? 'Admin' : 'Player';
-      players[element.documentID] = [privilege, element.data['name']];
+      players[element.documentID] = [
+        privilege,
+        element.data['name'],
+        element.data['role'],
+      ];
     }
   });
 

@@ -16,11 +16,19 @@ dynamic playerListDisplay(
 ) {
   DocumentSnapshot currentData = Provider.of<DocumentSnapshot>(context);
   Map players = getCurrentPlayers(context);
+  List<String> vampires;
+
+  players.forEach((key, value) {
+    if (players[key][2] == 'vampire') {
+      vampires.add(players[key][1]);
+    }
+  });
 
   bool inSession = false;
   bool isAdmin = false;
   bool inLobby = true;
   bool atNight = false;
+
   if (currentData != null) {
     inSession = currentData.data['inSession'];
     isAdmin = currentData.data['isAdmin'];
@@ -115,12 +123,37 @@ dynamic playerListDisplay(
       ),
     );
   } else if (inSession && !isAdmin && atNight) {
-    Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) =>
-                Night(player: player, sessionID: sessionID)),
-        (route) => false);
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+            child: Text(
+              'The game has started. \n\nClick below.',
+              style: TextStyle(color: Colors.white, fontSize: 30),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Center(child: Text('Other vampires:\n')),
+          for (var vampire in vampires) Center(child: Text(vampire)),
+          SizedBox(height: 75),
+          FlatButton(
+            color: Colors.transparent,
+            onPressed: () => Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                        Night(player: player, sessionID: sessionID)),
+                (route) => false),
+            child: Text(
+              'OK',
+              style: TextStyle(color: Colors.white, fontSize: 25),
+            ),
+          ),
+        ],
+      ),
+    );
   } else if (!inSession) {
     return Scaffold(
       backgroundColor: Colors.black,

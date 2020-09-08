@@ -10,7 +10,7 @@ import 'package:vampir/logic/night_logic.dart';
 dynamic night(
   context,
   CollectionReference database,
-  Map<String, String> players,
+  Map<String, List<String>> players,
   bool didVote,
   String votedFor,
   String sessionID,
@@ -44,18 +44,21 @@ dynamic night(
         children: [
           for (String playerID in players.keys)
             Card(
+              color: Colors.deepPurple,
               child: ListTile(
                 title: Padding(
                   padding: const EdgeInsets.only(left: 25),
-                  child: Text(playerID),
+                  child: Text(players[playerID][1],
+                      style: TextStyle(color: Colors.white)),
                 ),
                 subtitle: Padding(
                   padding: const EdgeInsets.only(left: 25),
-                  child: Text(players[playerID]),
+                  child: Text(players[playerID][0],
+                      style: TextStyle(color: Colors.white)),
                 ),
                 leading: Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Icon(Icons.person),
+                  padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
+                  child: Icon(Icons.person, color: Colors.white),
                 ),
                 onTap: () =>
                     vampireVote(player, didVote, playerID, database, votedFor),
@@ -72,18 +75,21 @@ dynamic night(
         children: [
           for (String playerID in players.keys)
             Card(
+              color: Colors.deepPurple,
               child: ListTile(
                 title: Padding(
                   padding: const EdgeInsets.only(left: 25),
-                  child: Text(playerID),
+                  child: Text(players[playerID][1],
+                      style: TextStyle(color: Colors.white)),
                 ),
                 subtitle: Padding(
                   padding: const EdgeInsets.only(left: 25),
-                  child: Text(players[playerID]),
+                  child: Text(players[playerID][0],
+                      style: TextStyle(color: Colors.white)),
                 ),
                 leading: Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Icon(Icons.person),
+                  padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
+                  child: Icon(Icons.person, color: Colors.white),
                 ),
                 onTap: () =>
                     vampireVote(player, didVote, playerID, database, votedFor),
@@ -93,13 +99,43 @@ dynamic night(
       ),
     );
   } else if (inSession && !atNight) {
-    Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (BuildContext context) =>
-              Day(player: player, sessionID: sessionID),
-        ),
-        (route) => false);
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'You\'ve survived! \n\nClick to go to Day.',
+            style: TextStyle(color: Colors.white, fontSize: 30),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 75),
+          FlatButton(
+            color: Colors.transparent,
+            onPressed: () {
+              Firestore.instance
+                  .collection('players')
+                  .document(player.email)
+                  .setData({
+                'atDay': true,
+                'atNight': false,
+              }, merge: true);
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                        Day(player: player, sessionID: sessionID),
+                  ),
+                  (route) => false);
+            },
+            child: Text(
+              'OK',
+              style: TextStyle(color: Colors.white, fontSize: 25),
+            ),
+          ),
+        ],
+      ),
+    );
   } else if (!inSession) {
     return Scaffold(
       backgroundColor: Colors.black,
@@ -114,11 +150,25 @@ dynamic night(
           SizedBox(height: 75),
           FlatButton(
             color: Colors.transparent,
-            onPressed: () => Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                  builder: (BuildContext context) => Home(email: player.email),
-                ),
-                (route) => false),
+            onPressed: () {
+              Firestore.instance
+                  .collection('players')
+                  .document(player.email)
+                  .setData({
+                'atDay': false,
+                'atNight': false,
+                'inLobby': false,
+                'isAdmin': false,
+                'inSession': false,
+                'role': 'villager',
+              }, merge: true);
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                        Home(email: player.email),
+                  ),
+                  (route) => false);
+            },
             child: Text(
               'OK',
               style: TextStyle(color: Colors.white, fontSize: 25),

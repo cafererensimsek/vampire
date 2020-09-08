@@ -60,7 +60,7 @@ class _HomeState extends State<Home> {
       userName(
           context, playerData, player, userNameController, _userName, email),
       Builder(
-          builder: (BuildContext context) =>
+          builder: (context) =>
               sessionScreen(context, sessionIDController, player, sessionID)),
     ];
 
@@ -68,7 +68,7 @@ class _HomeState extends State<Home> {
       backgroundColor: Colors.black,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Builder(
-        builder: (BuildContext ctx) {
+        builder: (ctx) {
           return FloatingActionButton(
             child: Icon(Icons.add),
             onPressed: () => createTheGame(ctx, player, numberOfVampires),

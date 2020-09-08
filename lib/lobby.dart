@@ -41,7 +41,7 @@ class _LobbyState extends State<Lobby> {
         StreamProvider<DocumentSnapshot>.value(value: playerData),
       ],
       child: Builder(
-        builder: (BuildContext context) => playerListDisplay(
+        builder: (context) => playerListDisplay(
           context,
           database,
           player,

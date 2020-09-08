@@ -140,14 +140,14 @@ void vampireVote(Player player, bool didVote, String playerID,
   }
 }
 
-Future<Map<String, String>> getPlayers(String sessionID) async {
-  Map<String, String> players = {};
+Future<Map<String, List<String>>> getPlayers(String sessionID) async {
+  Map<String, List<String>> players = {};
   QuerySnapshot docs =
       await Firestore.instance.collection(sessionID).getDocuments();
   docs.documents.forEach((element) {
     if (element.documentID != 'Game Settings') {
       String privilege = element.data['isAdmin'] ? 'Admin' : 'Player';
-      players[element.documentID] = privilege;
+      players[element.documentID] = [privilege, element.data['name']];
     }
   });
   return players;

@@ -11,7 +11,7 @@ void createTheGame(BuildContext context, Player player, int numberOfVampires) {
   showModalBottomSheet(
     elevation: 10,
     context: context,
-    builder: (BuildContext ctx) {
+    builder: (ctx) {
       return Container(
         height: 225,
         child: Column(
@@ -25,7 +25,7 @@ void createTheGame(BuildContext context, Player player, int numberOfVampires) {
             ),
             SizedBox(height: 10),
             StatefulBuilder(
-              builder: (BuildContext ctx, setState) {
+              builder: (ctx, setState) {
                 return Center(
                   child: DropdownButton<int>(
                     hint: Text(
@@ -77,8 +77,12 @@ void createTheGame(BuildContext context, Player player, int numberOfVampires) {
   );
 }
 
-Widget sessionScreen(BuildContext context, TextEditingController controller,
-    Player player, String sessionID) {
+Widget sessionScreen(
+  BuildContext context,
+  TextEditingController controller,
+  Player player,
+  String sessionID,
+) {
   return Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
@@ -119,7 +123,7 @@ StreamProvider userName(
   return StreamProvider<DocumentSnapshot>.value(
     value: playerData,
     child: Consumer<DocumentSnapshot>(
-      builder: (BuildContext ctx, DocumentSnapshot snapshot, child) {
+      builder: (ctx, snapshot, _) {
         updatePlayerStream(player, ctx);
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,

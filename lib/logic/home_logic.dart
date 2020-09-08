@@ -42,7 +42,7 @@ Future createGame(
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => Lobby(
+        builder: (_) => Lobby(
           player: player,
           sessionID: sessionID,
         ),
@@ -56,14 +56,14 @@ Future createGame(
 }
 
 Future<bool> doesExist(String sessionID) async {
-  var data;
+  int data;
   try {
-    Firestore.instance
+    await Firestore.instance
         .collection(sessionID)
         .document('Game Settings')
         .get()
-        .then((value) => data = value.data);
-    return data != null ? true : false;
+        .then((value) => data = value.data['vampireCount']);
+    return data > 0 ? true : false;
   } catch (e) {
     return false;
   }
@@ -72,13 +72,16 @@ Future<bool> doesExist(String sessionID) async {
 Future addPlayer(
     Player player, String sessionID, BuildContext context, String email) async {
   bool check = await doesExist(sessionID);
+
   if (check && player.email != null) {
     Firestore.instance.collection('players').document(email).setData({
       'inSession': true,
       'isAdmin': false,
       'inLobby': true,
     }, merge: true);
+
     await updatePlayerOnce(player, email);
+
     await Firestore.instance
         .collection(sessionID)
         .document(player.email)
@@ -87,10 +90,11 @@ Future addPlayer(
       'isAdmin': player.isAdmin,
       'role': player.role,
     });
+
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => Lobby(
+        builder: (_) => Lobby(
           player: player,
           sessionID: sessionID,
         ),

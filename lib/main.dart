@@ -96,7 +96,7 @@ class _AuthenticationState extends State<Authentication> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SingleChildScrollView(
-        child: Builder(builder: (BuildContext context) {
+        child: Builder(builder: (context) {
           return Column(children: [
             SizedBox(height: 250),
             Text('Login or Sign Up',
