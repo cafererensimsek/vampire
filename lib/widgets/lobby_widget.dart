@@ -15,7 +15,7 @@ dynamic playerListDisplay(
   String sessionID,
 ) {
   DocumentSnapshot currentData = Provider.of<DocumentSnapshot>(context);
-  Map players = getCurrentPlayers(context);
+  Map<String, List<String>> players = getCurrentPlayers(context);
   List<String> vampires;
 
   players.forEach((key, value) {
@@ -37,7 +37,7 @@ dynamic playerListDisplay(
     player.role = currentData['role'];
   }
 
-  if (inSession && isAdmin) {
+  if (inSession && isAdmin && inLobby) {
     return Scaffold(
       backgroundColor: Colors.black,
       floatingActionButton: floatingAction(
@@ -50,8 +50,7 @@ dynamic playerListDisplay(
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.shuffle),
-            onPressed:
-                player.isAdmin ? () => assignRoles(database, player) : null,
+            onPressed: () => assignRoles(database, player),
           ),
           IconButton(
             icon: Icon(Icons.restore),
@@ -59,34 +58,33 @@ dynamic playerListDisplay(
           ),
         ],
       ),
-      body: ListView(
-        children: [
-          for (String playerID in players.keys)
-            Card(
-              color: Theme.of(context).primaryColor,
-              child: ListTile(
-                title: Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: Text(players[playerID][1],
-                      style: TextStyle(color: Colors.white)),
-                ),
-                subtitle: Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: Text(players[playerID][0],
-                      style: TextStyle(color: Colors.white)),
-                ),
-                onTap: () => deletePlayer(database, playerID, player),
-                leading: Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Icon(Icons.person, color: Colors.white),
-                ),
-                trailing: Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: Icon(Icons.delete, color: Colors.white),
-                ),
-              ),
+      body: ListView.builder(
+        itemCount: players.keys.length,
+        itemBuilder: (context, index) => Card(
+          color: Theme.of(context).primaryColor,
+          child: ListTile(
+            title: Padding(
+              padding: const EdgeInsets.only(left: 20),
+              child: Text(players[index][1],
+                  style: TextStyle(color: Colors.white)),
             ),
-        ],
+            subtitle: Padding(
+              padding: const EdgeInsets.only(left: 20),
+              child: Text(players[index][0],
+                  style: TextStyle(color: Colors.white)),
+            ),
+            onLongPress: () =>
+                deletePlayer(database, players.keys.toList()[index], player),
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: Icon(Icons.person, color: Colors.white),
+            ),
+            trailing: Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: Icon(Icons.delete, color: Colors.white),
+            ),
+          ),
+        ),
       ),
     );
   } else if (inSession && !isAdmin && inLobby) {
@@ -96,30 +94,27 @@ dynamic playerListDisplay(
         title: Text("Session ID:$sessionID"),
         centerTitle: true,
       ),
-      body: ListView(
-        children: [
-          for (String playerID in players.keys)
-            Card(
-              color: Theme.of(context).primaryColor,
-              child: ListTile(
-                title: Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: Text(players[playerID][1],
-                      style: TextStyle(color: Colors.white)),
-                ),
-                subtitle: Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: Text(players[playerID][0],
-                      style: TextStyle(color: Colors.white)),
-                ),
-                onLongPress: () => deletePlayer(database, playerID, player),
-                leading: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
-                  child: Icon(Icons.person, color: Colors.white),
-                ),
-              ),
+      body: ListView.builder(
+        itemCount: players.keys.length,
+        itemBuilder: (context, index) => Card(
+          color: Theme.of(context).primaryColor,
+          child: ListTile(
+            title: Padding(
+              padding: const EdgeInsets.only(left: 20),
+              child: Text(players[index][1],
+                  style: TextStyle(color: Colors.white)),
             ),
-        ],
+            subtitle: Padding(
+              padding: const EdgeInsets.only(left: 20),
+              child: Text(players[index][0],
+                  style: TextStyle(color: Colors.white)),
+            ),
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: Icon(Icons.person, color: Colors.white),
+            ),
+          ),
+        ),
       ),
     );
   } else if (inSession && !isAdmin && atNight) {
@@ -128,15 +123,13 @@ dynamic playerListDisplay(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Center(
-            child: Text(
-              'The game has started. \n\nClick below.',
-              style: TextStyle(color: Colors.white, fontSize: 30),
-              textAlign: TextAlign.center,
-            ),
+          Text(
+            'The game has started. \n\nClick below.',
+            style: TextStyle(color: Colors.white, fontSize: 30),
+            textAlign: TextAlign.center,
           ),
-          Center(child: Text('Other vampires:\n')),
-          for (var vampire in vampires) Center(child: Text(vampire)),
+          if (vampires.contains(player.name))
+            for (var vampire in vampires) Text(vampire),
           SizedBox(height: 75),
           FlatButton(
             color: Colors.transparent,
