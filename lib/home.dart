@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:vampir/shared/player.dart';
-import 'package:vampir/widgets/home_widget.dart';
+import 'package:vampir/widgets/home_widgets/user_name.dart';
+import 'package:vampir/widgets/home_widgets/bottom_sheet.dart';
+import 'package:vampir/widgets/home_widgets/session_screen.dart';
 
 class Home extends StatefulWidget {
   final String email;
@@ -57,22 +59,27 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     List<dynamic> bodyWidgets = [
-      userName(
-          context, playerData, player, userNameController, _userName, email),
+      UsernameScreen(
+          context: context,
+          playerData: playerData,
+          player: player,
+          controller: userNameController,
+          userName: _userName),
       Builder(
-          builder: (context) =>
-              sessionScreen(context, sessionIDController, player, sessionID)),
+        builder: (context) => SessionScreen(
+            context: context,
+            controller: sessionIDController,
+            player: player,
+            sessionID: sessionID),
+      ),
     ];
-
     return Scaffold(
       backgroundColor: Colors.black,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Builder(
         builder: (ctx) {
-          return FloatingActionButton(
-            child: Icon(Icons.add),
-            onPressed: () => createTheGame(ctx, player, numberOfVampires),
-          );
+          return BottomSheetButton(
+              context: ctx, player: player, vampireCount: numberOfVampires);
         },
       ),
       body: bodyWidgets[_index],

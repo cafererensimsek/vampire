@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:vampir/logic/day_logic.dart';
 import 'shared/player.dart';
 import 'shared/widgets.dart';
-import 'widgets/day_widgets.dart/day_widget.dart';
+import 'widgets/day_widgets/day_widget.dart';
 
 class Day extends StatefulWidget {
   final Player player;

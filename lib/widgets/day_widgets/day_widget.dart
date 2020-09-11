@@ -4,9 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:vampir/shared/404.dart';
 import 'package:vampir/shared/died.dart';
 import 'package:vampir/shared/player.dart';
-import 'package:vampir/widgets/day_widgets.dart/admin_day.dart';
-import 'package:vampir/widgets/day_widgets.dart/night_pass.dart';
-import 'package:vampir/widgets/day_widgets.dart/player_day.dart';
+import 'package:vampir/widgets/day_widgets/admin_day.dart';
+import 'package:vampir/widgets/day_widgets/night_pass.dart';
+import 'package:vampir/widgets/day_widgets/player_day.dart';
 
 Widget day(
   BuildContext context,
