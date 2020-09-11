@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:vampir/widgets/lobby_widget.dart';
+import 'package:vampir/widgets/lobby_widgets/lobby_widget.dart';
 import 'shared/player.dart';
 
 class Lobby extends StatefulWidget {
@@ -34,7 +34,6 @@ class _LobbyState extends State<Lobby> {
 
   @override
   Widget build(BuildContext context) {
-    CollectionReference database = Firestore.instance.collection(sessionID);
     return MultiProvider(
       providers: [
         StreamProvider<QuerySnapshot>.value(value: currentPlayers),
@@ -43,7 +42,7 @@ class _LobbyState extends State<Lobby> {
       child: Builder(
         builder: (context) => playerListDisplay(
           context,
-          database,
+          Firestore.instance.collection(sessionID),
           player,
           sessionID,
         ),
