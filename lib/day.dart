@@ -30,8 +30,6 @@ class _DayState extends State<Day> {
 
   @override
   Widget build(BuildContext context) {
-    CollectionReference database = Firestore.instance.collection(sessionID);
-
     return StreamProvider.value(
       value: playerData,
       child: FutureBuilder(
@@ -43,7 +41,7 @@ class _DayState extends State<Day> {
           return snapshot.hasData
               ? day(
                   context,
-                  database,
+                  Firestore.instance.collection(sessionID),
                   snapshot.data,
                   false,
                   "",
