@@ -11,6 +11,11 @@ void startGame(
   BuildContext context,
   String sessionID,
 ) {
+  Firestore.instance
+      .collection('sessionID')
+      .document('Game Settings')
+      .updateData({'isInLobyy': false});
+
   Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(

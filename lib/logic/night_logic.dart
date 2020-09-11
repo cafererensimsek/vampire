@@ -58,17 +58,6 @@ void killVampireChoice(sessionID, vampireChoice) {
       .setData({'inSession': false}, merge: true);
 }
 
-void setSettings(sessionID) {
-  Firestore.instance
-      .collection(sessionID)
-      .document('Game Settings')
-      .updateData({
-    'didNightEnd': true,
-    'didDayEnd': false,
-    'isInLobby': false,
-  });
-}
-
 Future<void> setNewAdmin(sessionID, vampireKill) async {
   await Firestore.instance
       .collection(sessionID)
@@ -100,7 +89,6 @@ void endNight(
   var vampireChoice = await findVampireChoice(sessionID);
   killVampireChoice(sessionID, vampireChoice);
 
-  setSettings(sessionID);
   await setNewAdmin(sessionID, vampireChoice);
 
   Navigator.pushAndRemoveUntil(

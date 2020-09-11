@@ -72,8 +72,15 @@ Future<bool> doesExist(String sessionID) async {
 Future addPlayer(
     Player player, String sessionID, BuildContext context, String email) async {
   bool check = await doesExist(sessionID);
+  bool isInLobby = false;
 
-  if (check && player.email != null) {
+  Firestore.instance
+      .collection(sessionID)
+      .document('GameSettings')
+      .get()
+      .then((value) => isInLobby = value.data['isInLobby']);
+
+  if (check && player.email != null && isInLobby) {
     Firestore.instance.collection('players').document(email).setData({
       'inSession': true,
       'isAdmin': false,

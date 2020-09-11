@@ -58,17 +58,6 @@ void killVillagerChoice(sessionID, villagerChoice) {
       .setData({'inSession': false}, merge: true);
 }
 
-void setSettings(sessionID) {
-  Firestore.instance
-      .collection(sessionID)
-      .document('Game Settings')
-      .updateData({
-    'didNightEnd': true,
-    'didDayEnd': false,
-    'isInLobby': false,
-  });
-}
-
 Future<void> setNewAdmin(sessionID, villagerKill) async {
   await Firestore.instance
       .collection(sessionID)
@@ -100,7 +89,6 @@ void endDay(
   var villagerChoice = await findvillagerChoice(sessionID);
   killVillagerChoice(sessionID, villagerChoice);
 
-  setSettings(sessionID);
   await setNewAdmin(sessionID, villagerChoice);
 
   Navigator.pushAndRemoveUntil(

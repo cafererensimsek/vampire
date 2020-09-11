@@ -9,7 +9,6 @@ class UsernameScreen extends StatefulWidget {
   final BuildContext context;
   final Stream<DocumentSnapshot> playerData;
   final Player player;
-  final TextEditingController controller;
   final String userName;
   final String email;
 
@@ -18,25 +17,47 @@ class UsernameScreen extends StatefulWidget {
       @required this.context,
       @required this.playerData,
       @required this.player,
-      @required this.controller,
       @required this.userName,
-      this.email})
+      @required this.email})
       : super(key: key);
   @override
-  _UsernameScreenState createState() => _UsernameScreenState(
-      context, playerData, player, controller, userName, email);
+  _UsernameScreenState createState() =>
+      _UsernameScreenState(context, playerData, player, userName, email);
 }
 
 class _UsernameScreenState extends State<UsernameScreen> {
   final BuildContext context;
   final Stream<DocumentSnapshot> playerData;
   final Player player;
-  final TextEditingController controller;
-  final String userName;
   final String email;
+  String userName;
 
-  _UsernameScreenState(this.context, this.playerData, this.player,
-      this.controller, this.userName, this.email);
+  _UsernameScreenState(
+    this.context,
+    this.playerData,
+    this.player,
+    this.userName,
+    this.email,
+  );
+  final userNameController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    userNameController.addListener(_changeUserName);
+  }
+
+  @override
+  void dispose() {
+    userNameController.dispose();
+    super.dispose();
+  }
+
+  _changeUserName() {
+    setState(() {
+      userName = userNameController.text;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamProvider<DocumentSnapshot>.value(
@@ -55,7 +76,7 @@ class _UsernameScreenState extends State<UsernameScreen> {
                 ),
               ),
               SizedBox(height: 30),
-              textInput(controller: controller),
+              textInput(controller: userNameController),
               FlatButton(
                 child: Text(
                   'Change',

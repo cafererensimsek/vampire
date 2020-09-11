@@ -20,7 +20,7 @@ class BottomSheetButton extends StatefulWidget {
       _BottomSheetButtonState(context, player, vampireCount);
 }
 
-class _BottomSheetButtonState extends State<BottomSheet> {
+class _BottomSheetButtonState extends State<BottomSheetButton> {
   final BuildContext context;
   final Player player;
   int vampireCount;

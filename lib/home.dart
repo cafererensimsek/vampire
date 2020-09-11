@@ -14,7 +14,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final userNameController = TextEditingController();
   final sessionIDController = TextEditingController();
   final String email;
   String sessionID;
@@ -30,25 +29,17 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     sessionIDController.addListener(_changeSessionID);
-    userNameController.addListener(_changeUserName);
   }
 
   @override
   void dispose() {
     sessionIDController.dispose();
-    userNameController.dispose();
     super.dispose();
   }
 
   _changeSessionID() {
     setState(() {
       sessionID = sessionIDController.text;
-    });
-  }
-
-  _changeUserName() {
-    setState(() {
-      _userName = userNameController.text;
     });
   }
 
@@ -63,7 +54,7 @@ class _HomeState extends State<Home> {
           context: context,
           playerData: playerData,
           player: player,
-          controller: userNameController,
+          email: email,
           userName: _userName),
       Builder(
         builder: (context) => SessionScreen(
