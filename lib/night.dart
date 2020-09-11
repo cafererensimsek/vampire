@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:vampir/logic/night_logic.dart';
 import 'shared/player.dart';
 import 'shared/widgets.dart';
-import 'widgets/night_widget.dart';
+import 'widgets/night_widgets/night_widget.dart';
 
 class Night extends StatefulWidget {
   final Player player;
