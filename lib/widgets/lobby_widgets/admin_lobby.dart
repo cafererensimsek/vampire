@@ -17,6 +17,7 @@ class AdminLobby extends StatelessWidget {
     @required this.database,
     @required this.players,
   }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,12 +47,12 @@ class AdminLobby extends StatelessWidget {
           child: ListTile(
             title: Padding(
               padding: const EdgeInsets.only(left: 20),
-              child: Text(players[index][1],
+              child: Text(players[players.keys.toList()[index]][1],
                   style: TextStyle(color: Colors.white)),
             ),
             subtitle: Padding(
               padding: const EdgeInsets.only(left: 20),
-              child: Text(players[index][0],
+              child: Text(players[players.keys.toList()[index]][0],
                   style: TextStyle(color: Colors.white)),
             ),
             onLongPress: () =>
