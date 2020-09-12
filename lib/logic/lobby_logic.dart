@@ -77,6 +77,10 @@ Map getCurrentPlayers(BuildContext context) {
   final currentPlayers = Provider.of<QuerySnapshot>(context);
   Map<String, List<String>> players = {};
 
+  if (currentPlayers == null) {
+    return players;
+  }
+
   currentPlayers.documents.forEach((element) {
     if (element.documentID != 'Game Settings') {
       String privilege = element.data['isAdmin'] ? 'Admin' : 'Player';
